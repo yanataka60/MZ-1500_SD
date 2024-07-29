@@ -21,7 +21,8 @@
 |アプリケーション名|備考|
 | ------------ | ------------ |
 |MZ-700用SBasic 1Z-007B||
-|ROPOKO80K_v1_1_1||
+|ROPOKO v1.2.2||
+|ROPOKO80K v1.1.2||
 
 　なお、Arduino、ROMへ書き込むための機器が別途必要となります。
 
@@ -69,7 +70,11 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 ![MicroSD Card Adapter1](https://github.com/yanataka60/MZ-1500_SD/blob/main/JPEG/MicroSD%20Card%20Adapter.JPG)
 
 ## ROMへの書込み
-　まず、BASICからMONITOR(0000h～129Fh)を抜き出し、バイナリファイルとして保存します。
+　Z80フォルダの「1Z-009B_Launcher」フォルダ内の1Z-009B_SD_Launcher.binをROMライター(TL866II Plus等)を使って27C256に書き込んでください。
+
+　27C512を使えば二つのバイナリファイルを切り替えて使うような使い方ができます。このとき、一つのバイナリファイルは32KByte、二つ合わせて64KByteにして書き込んでください。
+
+　もうひとつのLauncherとしてFN-700_1500SD_Launcher.bin
 
 |機種名|BASIC名|モニタ名|
 | ------------ | ------------ | ------------ |
