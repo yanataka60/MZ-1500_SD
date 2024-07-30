@@ -74,13 +74,30 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 　27C512を使えば二つのバイナリファイルを切り替えて使うような使い方ができます。このとき、一つのバイナリファイルは32KByte、二つ合わせて64KByteにして書き込んでください。
 
-　もうひとつのLauncherとして「Oh!MZ別冊 ADVANCED MZ-700」に掲載されたMZ-80K/CコンパチモニタFN-7000をベースとしたFN-700_1500SD_Launcherを作成しました。
+　もうひとつのLauncherとして「Oh!MZ別冊 ADVANCED MZ-700」に掲載されたMZ-80K/CコンパチモニタFN-700をベースとしたFN-700_1500SD_Launcherを作成しました。
 
-　Z80フォルダの「FN-700」フォルダ内のFN-700_1500SD_Launcher.binをROMに書き込んで使用してください。
+### FN-700_1500SD_Launcher.bin作成手順
+　「Oh!MZ別冊 ADVANCED MZ-700」掲載のMZ-80K/CコンパチモニタFN-700のMZTファイルを用意します。
+
+　MZTファイルのヘッダ128Byte分は不要ですのでバイナリエディタで削除します。
+
+　先頭の16Byteも不要ですので削除し、C3 4A 00から始まる4096Byteのファイルとします。
+
+　Z80フォルダの「FN-700_Launcher」フォルダ内のFN-700_1500SD.binを先程加工したFN-700の後ろに連結します。6430Byteのファイルになります。
+
+　先頭に9Byteのヘッダ「00 00 00 12 00 22 00 00 00」を付加します。6439Byteのファイルになります。FN-700_1500SD_DATA.binなど適当なファイル名を付けて保存します。
+
+　Z80フォルダの「FN-700_Launcher」フォルダ内の1Z-1R12_Header.exeを実行し、先程作成したFN-700_1500SD_DATA.binをドラッグ＆ドロップします。
+
+　1Z-1R12_Header.exeを起動したフォルダにチェックサムを正しく計算したMZ1500SD.ROMが作成されます。6574Byteのファイルになっているはずです。
+
+　MZ1500SD.ROM(FN-700_1500SD_Launcher.bin)をROMライター(TL866II Plus等)を使ってROMに書き込んでください。
 
 ## Arduinoプログラム
 
 　MZ-80K_SDと全く同じものを使用しています。
+
+https://github.com/yanataka60/MZ80K_SD/tree/main/Arduino/MZ-80K_SD
 
 　MZ-80K_SDでソケットを使用して差込式にしているのであればそのままMZ-2000_SDに差して使えます。
 
@@ -171,7 +188,7 @@ FDL BASIC S[CR]
 ## アプリケーションからSD-CARDとのLOAD、SAVEをするための対応
 ### BASIC
 
-## MZ-700版ロポコのMZ-80K_SD対応パッチ
+## MZ-700版ロポコのMZ-1500_SD対応パッチ
 　ロポコ for MZ-80KはMZ-80K_SDにも対応していますが、元祖MZ-700版ロポコはMZ-80K_SDに対応していません。
 
 　この度、作者のTookato様がロポコVersion 1.2.2をリリースされましたが、このアーカイブには無圧縮版のロポコが同梱されており、パッチを当てることでMZ-80K_SD対応とすることが出来ましたので公開します。
