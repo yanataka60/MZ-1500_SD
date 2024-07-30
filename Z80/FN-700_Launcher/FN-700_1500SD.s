@@ -1,52 +1,19 @@
-		ORG		3200H
+		ORG		2200H
 		
-		LD		DE,2200H						;ROM 1Z-009Bを2200Hからにコピー
-		LD		HL,0000H
-		LD		BC,1000H
-		LDIR
-		
-		OUT		(0E0H),A						;0000h-0FFFhをRAMに切り替え
-		LD		DE,0000H						;2200h-31FFhを0000h-0FFFhへコピー
-		LD		HL,2200H
+		OUT		(0E0H),A
+		LD		DE,0000H
+		LD		HL,1200H
 		LD		BC,1000H
 		LDIR
 
-		LD		DE,ENT0							;SDアクセスルーチンをC100hへコピー
+		LD		DE,ENT0
 		LD		HL,TENSO
 		LD		BC,DBRCV0-ENT0+ENT6-DBRCV2
 		LDIR
-
-		LD		HL,0085H						;起動ジャンプ先をE800hから0085hに変更
-		LD		(0001H),HL
-		
-		LD		HL,ENT0							;Fコマンドのジャンプ先をF000hからC100hに変更
-		LD		(00F7H),HL
-		
-		LD		HL,0000H						;E800hにROMが存在するとROMにジャンプしてしまうのを抑制
-		LD		(00ABH),HL
-		
-		LD		A,0C3H
-		LD		(0436H),A
-		LD		HL,ENT1							;MSHED
-		LD		(0437H),HL
-		LD		(0475H),A
-		LD		HL,ENT2							;MSDAT
-		LD		(0476H),HL
-		LD		(04D8H),A
-		LD		HL,ENT3							;MLHED
-		LD		(04D9H),HL
-		LD		(04F8H),A
-		LD		HL,ENT4							;MLDAT
-		LD		(04F9H),HL
-		LD		(0588H),A
-		LD		HL,ENT5							;MVRFY
-		LD		(0589H),HL
-
-		JP		0000H							;MONITOR START
+		JP		0000H
 
 TENSO:
 
-;
 GETL		EQU		0003H
 LETLN		EQU		0006H
 NEWLIN		EQU		0009H
@@ -88,9 +55,7 @@ MONITOR_700	EQU		00ADH
 ;
 ;0A3H コントロールレジスタ
 
-
        ORG		0C100H
-
 ENT0:
 		NOP                   ;ROM識別コード
 		JP		START

@@ -1,53 +1,20 @@
 			  Z80 ASSEMBLER - ZASM VER 1.6
-  3200                			ORG		3200H
+  2200                			ORG		2200H
                       			
-  3200  110022        			LD		DE,2200H						;ROM 1Z-009Bを2200Hからにコピー
-  3203  210000        			LD		HL,0000H
-  3206  010010        			LD		BC,1000H
-  3209  EDB0          			LDIR
-                      			
-  320B  D3E0          			OUT		(0E0H),A						;0000h-0FFFhをRAMに切り替え
-  320D  110000        			LD		DE,0000H						;2200h-31FFhを0000h-0FFFhへコピー
-  3210  210022        			LD		HL,2200H
-  3213  010010        			LD		BC,1000H
-  3216  EDB0          			LDIR
+  2200  D3E0          			OUT		(0E0H),A
+  2202  110000        			LD		DE,0000H
+  2205  210012        			LD		HL,1200H
+  2208  010010        			LD		BC,1000H
+  220B  EDB0          			LDIR
                       	
-  3218  1100C1        			LD		DE,ENT0							;SDアクセスルーチンをC100hへコピー
-  321B  216732        			LD		HL,TENSO
-  321E  010309        			LD		BC,DBRCV0-ENT0+ENT6-DBRCV2
-  3221  EDB0          			LDIR
+  220D  1100C1        			LD		DE,ENT0
+  2210  211B22        			LD		HL,TENSO
+  2213  010309        			LD		BC,DBRCV0-ENT0+ENT6-DBRCV2
+  2216  EDB0          			LDIR
+  2218  C30000        			JP		0000H
                       	
-  3223  218500        			LD		HL,0085H						;起動ジャンプ先をE800hから0085hに変更
-  3226  220100        			LD		(0001H),HL
-                      			
-  3229  2100C1        			LD		HL,ENT0							;Fコマンドのジャンプ先をF000hからC100hに変更
-  322C  22F700        			LD		(00F7H),HL
-                      			
-  322F  210000        			LD		HL,0000H						;E800hにROMが存在するとROMにジャンプしてしまうのを抑制
-  3232  22AB00        			LD		(00ABH),HL
-                      			
-  3235  3EC3          			LD		A,0C3H
-  3237  323604        			LD		(0436H),A
-  323A  2104C1        			LD		HL,ENT1							;MSHED
-  323D  223704        			LD		(0437H),HL
-  3240  327504        			LD		(0475H),A
-  3243  2107C1        			LD		HL,ENT2							;MSDAT
-  3246  227604        			LD		(0476H),HL
-  3249  32D804        			LD		(04D8H),A
-  324C  210AC1        			LD		HL,ENT3							;MLHED
-  324F  22D904        			LD		(04D9H),HL
-  3252  32F804        			LD		(04F8H),A
-  3255  210DC1        			LD		HL,ENT4							;MLDAT
-  3258  22F904        			LD		(04F9H),HL
-  325B  328805        			LD		(0588H),A
-  325E  2110C1        			LD		HL,ENT5							;MVRFY
-  3261  228905        			LD		(0589H),HL
+  221B                	TENSO:
                       	
-  3264  C30000        			JP		0000H							;MONITOR START
-                      	
-  3267                	TENSO:
-                      	
-                      	;
   0003                	GETL		EQU		0003H
   0006                	LETLN		EQU		0006H
   0009                	NEWLIN		EQU		0009H
@@ -89,9 +56,7 @@
                       	;
                       	;0A3H コントロールレジスタ
                       	
-                      	
   C100                	       ORG		0C100H
-                      	
   C100                	ENT0:
   C100  00            			NOP                   ;ROM識別コード
   C101  C313C1        			JP		START
