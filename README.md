@@ -321,7 +321,7 @@ NEW NAME:TEST2[CR]
 
 　パッチを当てたファイルを「S-BASIC 1Z-007B 1500SD.MZT」等パッチを当てたことが識別できるファイル名で保存してお使いください。
 
-## ファイル名について
+#### ファイル名について
 
 　オリジナル通りに16文字までがファイル名となりますが、半角カナ文字はArduinoが認識できない、一部の記号はMZ-1500のキーボードから入力できないので使えません。
 
@@ -340,17 +340,17 @@ NEW NAME:TEST2[CR]
 　DOSファイル名が「TEST SBASIC EIGHT.MZT」の場合、LOAD "TEST SBASIC EIGHT"と入力しても「TEST SBASIC EIGH.MZT」というDOSファイルを探しに行くためロードできません。
 
 
-## MZ-700版ロポコのMZ-1500_SD対応パッチ
+### MZ-700版ロポコのMZ-1500_SD対応パッチ
 　この度、作者のTookato様がロポコVersion 1.2.2をリリースされましたが、このアーカイブには無圧縮版のロポコが同梱されており、パッチを当てることでMZ-1500_SD対応とすることが出来ましたので公開します。
 
-### 使い方
+#### 使い方
 　ロポコVersion 1.2.2を入手します。
 
 　解凍すると「Uncompressed」フォルダにROPOKO-PR.MZT、ROPOKO-AR.MZT、ROPOKO-BR.MZT、の三つのファイルがあるのでSDカードにコピーします。
 
 　このGitHubのMZ80K_SDリポジトリ中の「ROPOKO」フォルダ内の「ROPOKO-SD.MZT」をSDカードにコピーします。
 
-#### 「ROPOKO-SD.MZT」はMZ-80K_SD用と共用です。
+##### 「ROPOKO-SD.MZT」はMZ-80K_SD用と共用です。
 
 　FDL又はFDコマンドを使ってSDカードにコピーした「ROPOKO-SD.MZT」を実行します。
 
@@ -362,17 +362,17 @@ NEW NAME:TEST2[CR]
 
 　ただし、セーブ時に既にあるファイル名を指定すると上書きしますのでお気を付けください。
 
-## ロポコ(体験版)のMZ-80K_SD対応パッチ
+### ロポコ(体験版)のMZ-80K_SD対応パッチ
 　MZ-700版ロポコと同様にロポコ(体験版)もパッチを作成しました。
 
-### 使い方
+#### 使い方
 　ロポコ(体験版)を入手します。
 
 　解凍すると「Uncompressed」フォルダにROPOKO-TR.mztがあるのでSDカードにコピーします。
 
 　このGitHubのMZ80K_SDリポジトリ中の「ROPOKO-TRIAL」フォルダ内の「ROPOKO-T-SD.MZT」をSDカードにコピーします。
 
-#### 「ROPOKO-T-SD.MZT」はMZ-80K_SD用と共用です。
+##### 「ROPOKO-T-SD.MZT」はMZ-80K_SD用と共用です。
 
 　FDL又はFDコマンドを使ってSDカードにコピーした「ROPOKO-T-SD.MZT」を実行します。
 
