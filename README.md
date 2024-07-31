@@ -352,6 +352,7 @@ NEW NAME:TEST2[CR]
 　このGitHubのMZ80K_SDリポジトリ中の「ROPOKO」フォルダ内の「ROPOKO-SD.MZT」をSDカードにコピーします。
 
 ##### 「ROPOKO-SD.MZT」はMZ-80K_SD用と共用です。
+https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO
 
 　FDL又はFDコマンドを使ってSDカードにコピーした「ROPOKO-SD.MZT」を実行します。
 
@@ -374,6 +375,7 @@ NEW NAME:TEST2[CR]
 　このGitHubのMZ80K_SDリポジトリ中の「ROPOKO-TRIAL」フォルダ内の「ROPOKO-T-SD.MZT」をSDカードにコピーします。
 
 ##### 「ROPOKO-T-SD.MZT」はMZ-80K_SD用と共用です。
+https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 
 　FDL又はFDコマンドを使ってSDカードにコピーした「ROPOKO-T-SD.MZT」を実行します。
 
