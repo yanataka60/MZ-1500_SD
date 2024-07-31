@@ -14,13 +14,13 @@
   11AE                	MBUF		EQU		11AEH
                       	
                       	;*********** MZ-1500_SD *****************
-                      	;PPI_A		EQU		0A0H
+  00A0                	PPI_A		EQU		0A0H
                       	;*********** MZ-80K_SD  *****************
-  00D8                	PPI_A		EQU		0D8H
+                      	;PPI_A		EQU		0D8H
                       	
-  00D9                	PPI_B		EQU		PPI_A+1
-  00DA                	PPI_C		EQU		PPI_A+2
-  00DB                	PPI_R		EQU		PPI_A+3
+  00A1                	PPI_B		EQU		PPI_A+1
+  00A2                	PPI_C		EQU		PPI_A+2
+  00A3                	PPI_R		EQU		PPI_A+3
                       	
                       	;PPI_A PORTA 送信データ(下位4ビット)
                       	;PPI_B PORTB 受信データ(8ビット)
@@ -56,24 +56,24 @@
                       	;**** 8255初期化 ****
                       	;PORTC下位BITをOUTPUT、上位BITをINPUT、PORTBをINPUT、PORTAをOUTPUT
   CD1C  3E8A          	INIT:	LD		A,8AH
-  CD1E  D3DB          			OUT		(PPI_R),A
+  CD1E  D3A3          			OUT		(PPI_R),A
                       	;出力BITをリセット
   CD20  3E00          	INIT2:	LD		A,00H      ;PORTA <- 0
-  CD22  D3D8          			OUT		(PPI_A),A
-  CD24  D3DA          			OUT		(PPI_C),A   ;PORTC <- 0
+  CD22  D3A0          			OUT		(PPI_A),A
+  CD24  D3A2          			OUT		(PPI_C),A   ;PORTC <- 0
   CD26  C9            			RET
                       	
                       	;**** 1BYTE受信 ****
                       	;受信DATAをAレジスタにセットしてリターン
   CD27                	RCVBYTE:
   CD27  CD5CCD        			CALL	F1CHK      ;PORTC BIT7が1になるまでLOOP
-  CD2A  DBD9          			IN		A,(PPI_B)   ;PORTB -> A
+  CD2A  DBA1          			IN		A,(PPI_B)   ;PORTB -> A
   CD2C  F5            			PUSH 	AF
   CD2D  3E05          			LD		A,05H
-  CD2F  D3DB          			OUT		(PPI_R),A    ;PORTC BIT2 <- 1
+  CD2F  D3A3          			OUT		(PPI_R),A    ;PORTC BIT2 <- 1
   CD31  CD63CD        			CALL	F2CHK      ;PORTC BIT7が0になるまでLOOP
   CD34  3E04          			LD		A,04H
-  CD36  D3DB          			OUT		(PPI_R),A    ;PORTC BIT2 <- 0
+  CD36  D3A3          			OUT		(PPI_R),A    ;PORTC BIT2 <- 0
   CD38  F1            			POP 	AF
   CD39  C9            			RET
                       			
@@ -95,25 +95,25 @@
                       	;**** 4BIT送信 ****
                       	;Aレジスタ下位4ビットを送信する
   CD4B                	SND4BIT:
-  CD4B  D3D8          			OUT		(PPI_A),A
+  CD4B  D3A0          			OUT		(PPI_A),A
   CD4D  3E05          			LD		A,05H
-  CD4F  D3DB          			OUT		(PPI_R),A    ;PORTC BIT2 <- 1
+  CD4F  D3A3          			OUT		(PPI_R),A    ;PORTC BIT2 <- 1
   CD51  CD5CCD        			CALL	F1CHK      ;PORTC BIT7が1になるまでLOOP
   CD54  3E04          			LD		A,04H
-  CD56  D3DB          			OUT		(PPI_R),A    ;PORTC BIT2 <- 0
+  CD56  D3A3          			OUT		(PPI_R),A    ;PORTC BIT2 <- 0
   CD58  CD63CD        			CALL	F2CHK
   CD5B  C9            			RET
                       			
                       	;**** BUSYをCHECK(1) ****
                       	; 82H BIT7が1になるまでLOP
-  CD5C  DBDA          	F1CHK:	IN		A,(PPI_C)
+  CD5C  DBA2          	F1CHK:	IN		A,(PPI_C)
   CD5E  E680          			AND		80H        ;PORTC BIT7 = 1?
   CD60  28FA          			JR		Z,F1CHK
   CD62  C9            			RET
                       	
                       	;**** BUSYをCHECK(0) ****
                       	; 82H BIT7が0になるまでLOOP
-  CD63  DBDA          	F2CHK:	IN		A,(PPI_C)
+  CD63  DBA2          	F2CHK:	IN		A,(PPI_C)
   CD65  E680          			AND		80H        ;PORTC BIT7 = 0?
   CD67  20FA          			JR		NZ,F2CHK
   CD69  C9            			RET

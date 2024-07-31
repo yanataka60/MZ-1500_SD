@@ -13,9 +13,9 @@ LBUF		EQU		11A3H
 MBUF		EQU		11AEH
 
 ;*********** MZ-1500_SD *****************
-;PPI_A		EQU		0A0H
+PPI_A		EQU		0A0H
 ;*********** MZ-80K_SD  *****************
-PPI_A		EQU		0D8H
+;PPI_A		EQU		0D8H
 
 PPI_B		EQU		PPI_A+1
 PPI_C		EQU		PPI_A+2
