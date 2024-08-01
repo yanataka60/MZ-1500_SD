@@ -131,7 +131,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 https://github.com/yanataka60/MZ80K_SD/tree/main/Arduino/MZ-80K_SD
 
-　MZ-80K_SDでソケットを使用して差込式にしているのであればそのままMZ-2000_SDに差して使えます。
+　MZ-80K_SDでソケットを使用して差込式にしているのであればそのままMZ-1500_SDに差して使えます。
 
 　Arduino IDEを使ってMZ-80Kリポジトリ Arduinoフォルダ内のMZ-80K_SD.inoを書き込みます。
 
