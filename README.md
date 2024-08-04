@@ -2,7 +2,8 @@
 
 ![MZ-1500_SD](https://github.com/yanataka60/MZ-1500_SD/blob/main/JPEG/TITLE.jpg)
 
-#### MZ-1500でSD-CARDからのアプリケーション起動、BASICなどのアプリケーションからSD-CARDへのロード、セーブを実現するものですが、現在は標準BASIC MZ-5Z001もBASICプログラムのLOAD、SAVEに対応できていませんので機械語ゲームの起動等限定的な利用になります。
+#### 2024.8.4 BASIC MZ-5Z001でSDからのLOAD、SAVEに対応しました。
+#### ~~MZ-1500でSD-CARDからのアプリケーション起動、BASICなどのアプリケーションからSD-CARDへのロード、セーブを実現するものですが、現在は標準BASIC MZ-5Z001もBASICプログラムのLOAD、SAVEに対応できていませんので機械語ゲームの起動等限定的な利用になります。~~
 
 　MZ-1500にはMZ-1R12が装備されているとS-RAMに保存されているプログラムから起動する機能がありますが、疑似的にMZ-1R12のふりをすることでMZ-1500_SDに搭載したROMからSD-CARDからアプリケーションを起動させる機能を持たせたMONITORプログラムを起動させます。
 
@@ -20,6 +21,7 @@
 
 |アプリケーション名|備考|
 | ------------ | ------------ |
+|BASIC MZ-5Z001||
 |MZ-700用SBasic 1Z-007B||
 |ROPOKO v1.2.2||
 |ROPOKO体験版||
@@ -313,10 +315,50 @@ NEW NAME:TEST2[CR]
 
 　また、文字列入力等モニタルーチンを使っている箇所があるのでSP-1002、MZ-1Z009Bではない独自MONITOR上で動くアプリケーションはMONITORの解析も必要です。
 
-　「Oh!MZ別冊 ADVANCED MZ-700」に掲載されたMZ-80K/CコンパチモニタFN-700を使えばMZ-80K_SDに対応したMZ-80K用アプリケーションのほとんどがMZ-700+MZ-80K_SDでは使えましたが、MZ-1500+MZ-1500_SDではそのままでは使えません。
+　「Oh!MZ別冊 ADVANCED MZ-700」に掲載されたMZ-80K/CコンパチモニタFN-700を使えばMZ-80K_SDに対応したMZ-80K用アプリケーションのほとんどがMZ-700+MZ-80K_SDでは使えましたが、MZ-1500+MZ-1500_SDでは起動は出来ますが、アプリケーション内でのLOAD、SAVEはそのままでは使えません。
+
+### MZ-1500用BASIC MZ-5Z001
+　MZ-5Z001をイメージ化したmztファイルが必要です。
+
+　MZ-5Z001のイメージ化については簡単に書きますので詳細はWebで検索ください。
+
+　MZ-5Z001イメージ化
+　●kitahei88氏が開発、頒布されているQDC又はNorixさんが開発されたVirtuaQDでQDFファイルに変換、TAKEDAさんのEmuZ-1500を起動し、モニタからQCコマンドでQDFファイル中のMZ-5Z001を読み込ませた後、空のmztファイルをQDドライブにインサートしてYを押すと出来上がります。
+
+　MZ-5Z001.mztをバイナリエディタで開きます。ファイルの最後はA295hですが、A29Fhまで00hで埋めます。(もしかしたらバージョン違いでA295hで無いかもしれませんが、A29Fhまで00hで埋められれば大丈夫だと思います。)
+
+　Z80フォルダ中MZ-5Z001フォルダにある「mz-5z001_BOOT.bin」をMZ-5Z001.mztの後ろ(A2A0h～)に付加します。ファイルサイズ42128Byteになります。
+
+　MZ-5Z001.mztのヘッダを修正し、ファイルサイズをA410h、実行アドレスをA220hとします。
+
+　![MZ-5Z001](https://github.com/yanataka60/MZ-1500_SD/blob/main/JPEG/MZ-5Z001.jpg)
+
+　パッチを当てたファイルを「BASIC 1Z-5Z001-SD.MZT」等パッチを当てたことが識別できるファイル名で保存してお使いください。
+
+　パッチによりデフォルトメディアをQDからCMTに変更してあります。SDからLOAD、SAVEを行うときに機械名「CMT:」の指定の必要はありません。
+
+　SDアクセスルーチンをFDディレクトリバッファに置いていますのでFDと両立は出来ません。
+
+#### ファイル名について
+
+　オリジナル通りに16文字までがファイル名となりますが、半角カナ文字はArduinoが認識できない、一部の記号はMZ-1500のキーボードから入力できないので使えません。
+
+　ロングファイルネームに対応できなかった引き換えにLOADコマンドもオリジナル通りの入力方法となり、そのままDOSファイル名となります。
+
+例)
+
+　SAVE "TEST.BAS" : TEST.BAS.MZTというDOSファイル名で保存されます。
+
+　SAVE "TEST"     : TEST.MZTというDOSファイル名で保存されます。
+
+　LOAD "TEST.BAS" : TEST.BAS.MZTというDOSファイル名のファイルがロードされます。
+
+　LOAD "TEST"     : TEST.MZTというDOSファイル名のファイルがロードされます。
+
+　DOSファイル名が「TEST SBASIC EIGHT.MZT」の場合、LOAD "TEST SBASIC EIGHT"と入力しても「TEST SBASIC EIGH.MZT」というDOSファイルを探しに行くためロードできません。
 
 ### MZ-700用S-BASIC 1Z-007B
-　SBASIC_patch1.bin、SBASIC_patch2.binの二つをS-BASICのMZTファイルに当てます。
+　Z80フォルダ中SBASIC PATCHフォルダにあるSBASIC_patch1.bin、SBASIC_patch2.binの二つをS-BASICのMZTファイルに当てます。
 
 　MZTファイルの00A1Hから00AFHまで(実アドレス0021H～002FH)をSBASIC_patch1.binと差し替えます。
 
@@ -341,7 +383,6 @@ NEW NAME:TEST2[CR]
 　LOAD "TEST"     : TEST.MZTというDOSファイル名のファイルがロードされます。
 
 　DOSファイル名が「TEST SBASIC EIGHT.MZT」の場合、LOAD "TEST SBASIC EIGHT"と入力しても「TEST SBASIC EIGH.MZT」というDOSファイルを探しに行くためロードできません。
-
 
 ### MZ-700版ロポコのMZ-1500_SD対応パッチ
 　この度、作者のTookato様がロポコVersion 1.2.2をリリースされましたが、このアーカイブには無圧縮版のロポコが同梱されており、パッチを当てることでMZ-1500_SD対応とすることが出来ましたので公開します。
