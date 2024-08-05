@@ -335,6 +335,21 @@ NEW NAME:TEST2[CR]
 
 　パッチを当てたファイルを「BASIC 1Z-5Z001-SD.MZT」等パッチを当てたことが識別できるファイル名で保存してお使いください。
 
+#### AUTO RUNへの対応
+　なぜか、AUTO RUNが自動実行されないのでAUTO RUNが自動実行されるパッチも作成しました。適宜使い分けてください。
+
+　MZ-5Z001.mztをバイナリエディタで開き、A29Fhまで00hで埋めるところまでは同じです。
+
+　Z80フォルダ中MZ-5Z001フォルダにある「mz-5z001_BOOT_AUTORUN.bin」をMZ-5Z001.mztの後ろ(A2A0h～)に付加します。ファイルサイズ42126Byteになります。
+
+　MZ-5Z001.mztのヘッダを修正し、ファイルサイズをA40Eh、実行アドレスをA220hとします。
+
+　![MZ-5Z001_AUTORUN](https://github.com/yanataka60/MZ-1500_SD/blob/main/JPEG/MZ-5Z001_AUTORUN.jpg)
+
+　パッチを当てたファイルを「BASIC 1Z-5Z001-SD-AUTORUN.MZT」等パッチを当てたことが識別できるファイル名で保存してお使いください。
+
+　MZ-5Z001が起動したときにSDカードに保存されている「AUTO RUN.MZT」が自動実行されます。ファイルモードは「05」である必要があります。
+
 #### 注意点
 　BASIC MZ-5Z001の解析資料が乏しい中で一応SDに対応してみましたが、不具合が残っている可能性があることをご了承願います。
 
@@ -350,9 +365,7 @@ NEW NAME:TEST2[CR]
 
 ##### LOAD"xxxx",A、SAVE"xxxx",A、RUN"xxxx",Aのアスキー形式でのLOAD、SAVE、RUN及びRUN"xxxx",Rでの実行は出来ません。実行すると暴走するので実行しないでください。
 
-　QDから起動したときに自動実行されるAUTO RUNは、SDから起動したときには自動実行されません。
-
-　RUN"xxxx"コマンドでSDから読込後即実行することは可能です。
+　RUN"xxxx"コマンドでSDから読込後即実行も可能です。
 
 #### ファイル名について
 
@@ -586,5 +599,7 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 ## 追記
 2024.8.4 BASIC MZ-5Z001のSD対応パッチを公開しました。
 
-2024.8.4 BASIC MZ-5Z001のSD対応パッチ修正版を公開しました。
+2024.8.5 BASIC MZ-5Z001のSD対応パッチ修正版を公開しました。
+
+         BASIC MZ-5Z001のAUTORUN対応SDパッチを公開しました。
 
