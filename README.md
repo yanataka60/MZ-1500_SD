@@ -603,5 +603,5 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 
 2024.8.5 BASIC MZ-5Z001のSD対応パッチ修正版を公開しました。
 
-　　　　　BASIC MZ-5Z001のAUTORUN対応SDパッチを公開しました。
+　　　　BASIC MZ-5Z001のAUTORUN対応SDパッチを公開しました。
 
