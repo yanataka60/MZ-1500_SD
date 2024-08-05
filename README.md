@@ -2,6 +2,8 @@
 
 ![MZ-1500_SD](https://github.com/yanataka60/MZ-1500_SD/blob/main/JPEG/TITLE.jpg)
 
+MZ-1500でSD-CARDからのアプリケーション起動、BASICなどのアプリケーションからSD-CARDへのロード、セーブを実現するものです。
+
 #### 2024.8.4 BASIC MZ-5Z001でSDからのLOAD、SAVEに対応しました。
 #### ~~MZ-1500でSD-CARDからのアプリケーション起動、BASICなどのアプリケーションからSD-CARDへのロード、セーブを実現するものですが、現在は標準BASIC MZ-5Z001もBASICプログラムのLOAD、SAVEに対応できていませんので機械語ゲームの起動等限定的な利用になります。~~
 
