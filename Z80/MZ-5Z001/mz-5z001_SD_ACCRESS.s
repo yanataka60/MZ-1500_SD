@@ -223,9 +223,6 @@ MLH7:	LD		A,(DE)
 		INC		HL
 		DJNZ	MLH7
 		
-		LD		HL,(FSIZE)
-		LD		(LSIZE),HL
-		
 		JR		MRET       ;正常RETURN
 
 ;**************************** 04F8H MONITOR リード データ代替処理 ********************

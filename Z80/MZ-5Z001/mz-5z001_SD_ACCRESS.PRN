@@ -37,8 +37,8 @@
   2003  C36420        	ENT1:	JP		MSHED
   2006  C38620        	ENT2:	JP		MSDAT
   2009  C3C720        	ENT3:	JP		MLHED
-  200C  C31F21        	ENT4:	JP		MLDAT
-  200F  C37121        	ENT5:	JP		MVRFY
+  200C  C31921        	ENT4:	JP		MLDAT
+  200F  C36B21        	ENT5:	JP		MVRFY
                       			
   2012  CD1620        	START:	CALL	INIT
   2015  C9            			RET
@@ -114,9 +114,9 @@
   2065  C5            			PUSH	BC
   2066  E5            			PUSH	HL
   2067  3E91          			LD		A,91H      ;HEADER SAVEコマンド91H
-  2069  CD7321        			CALL	MCMD       ;コマンドコード送信
+  2069  CD6D21        			CALL	MCMD       ;コマンドコード送信
   206C  A7            			AND		A          ;00以外ならERROR
-  206D  C28421        			JP		NZ,MERR
+  206D  C27E21        			JP		NZ,MERR
                       	
   2070  21F010        			LD		HL,IBUFE
   2073  0680          			LD		B,80H
@@ -127,9 +127,9 @@
                       	
   207C  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
   207F  A7            			AND		A          ;00以外ならERROR
-  2080  C28421        			JP		NZ,MERR
+  2080  C27E21        			JP		NZ,MERR
                       	
-  2083  C37F21        			JP		MRET       ;正常RETURN
+  2083  C37921        			JP		MRET       ;正常RETURN
                       	
                       	;******************** 0475H MONITOR ライト データ代替処理 **********************
   2086                	MSDAT:
@@ -137,9 +137,9 @@
   2087  C5            			PUSH	BC
   2088  E5            			PUSH	HL
   2089  3E92          			LD		A,92H      ;DATA SAVEコマンド92H
-  208B  CD7321        			CALL	MCMD       ;コマンドコード送信
+  208B  CD6D21        			CALL	MCMD       ;コマンドコード送信
   208E  A7            			AND		A          ;00以外ならERROR
-  208F  C28421        			JP		NZ,MERR
+  208F  C27E21        			JP		NZ,MERR
                       	
   2092  210211        			LD		HL,FSIZE   ;FSIZE送信
   2095  7E            			LD		A,(HL)
@@ -150,7 +150,7 @@
                       	
   209E  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
   20A1  A7            			AND		A          ;00以外ならERROR
-  20A2  C28421        			JP		NZ,MERR
+  20A2  C27E21        			JP		NZ,MERR
                       	
   20A5  21F010        			LD		HL,IBUFE
   20A8  7E            			LD		A,(HL)
@@ -170,7 +170,7 @@
   20C1  23            			INC		HL
   20C2  20F6          			JR		NZ,MSD1
                       			
-  20C4  C37F21        			JP		MRET       ;正常RETURN
+  20C4  C37921        			JP		MRET       ;正常RETURN
                       	
                       	;************************** 04D8H MONITOR リード インフォメーション代替処理 *****************
   20C7                	MLHED:
@@ -178,9 +178,9 @@
   20C8  C5            			PUSH	BC
   20C9  E5            			PUSH	HL
   20CA  3E93          			LD		A,93H      ;HEADER LOADコマンド93H
-  20CC  CD7321        			CALL	MCMD       ;コマンドコード送信
+  20CC  CD6D21        			CALL	MCMD       ;コマンドコード送信
   20CF  A7            			AND		A          ;00以外ならERROR
-  20D0  C28421        			JP		NZ,MERR
+  20D0  C27E21        			JP		NZ,MERR
                       	
                       			
   20D3  110110        			LD		DE,LNAME
@@ -198,11 +198,11 @@
                       	
   20E8  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
   20EB  A7            			AND		A          ;00以外ならERROR
-  20EC  C28421        			JP		NZ,MERR
+  20EC  C27E21        			JP		NZ,MERR
                       	
   20EF  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
   20F2  A7            			AND		A          ;00以外ならERROR
-  20F3  C28421        			JP		NZ,MERR
+  20F3  C27E21        			JP		NZ,MERR
                       	
   20F6  21F010        			LD		HL,IBUFE
   20F9  0680          			LD		B,80H
@@ -213,7 +213,7 @@
                       	
   2102  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
   2105  A7            			AND		A          ;00以外ならERROR
-  2106  C28421        			JP		NZ,MERR
+  2106  C27E21        			JP		NZ,MERR
                       	
   2109  11F010        			LD		DE,IBUFE
   210C  210010        			LD		HL,ELMD		;DOSファイル名とIFBファイル名が異なっていても一致したことにする
@@ -224,43 +224,40 @@
   2114  23            			INC		HL
   2115  10FA          			DJNZ	MLH7
                       			
-  2117  2A0211        			LD		HL,(FSIZE)
-  211A  221410        			LD		(LSIZE),HL
-                      			
-  211D  1860          			JR		MRET       ;正常RETURN
+  2117  1860          			JR		MRET       ;正常RETURN
                       	
                       	;**************************** 04F8H MONITOR リード データ代替処理 ********************
-  211F                	MLDAT:
-  211F  D5            			PUSH	DE
-  2120  C5            			PUSH	BC
-  2121  E5            			PUSH	HL
-  2122  3E94          			LD		A,94H      ;DATA LOADコマンド94H
-  2124  CD7321        			CALL	MCMD       ;コマンドコード送信
-  2127  A7            			AND		A          ;00以外ならERROR
-  2128  C28421        			JP		NZ,MERR
+  2119                	MLDAT:
+  2119  D5            			PUSH	DE
+  211A  C5            			PUSH	BC
+  211B  E5            			PUSH	HL
+  211C  3E94          			LD		A,94H      ;DATA LOADコマンド94H
+  211E  CD6D21        			CALL	MCMD       ;コマンドコード送信
+  2121  A7            			AND		A          ;00以外ならERROR
+  2122  C27E21        			JP		NZ,MERR
                       	
-  212B  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  212E  A7            			AND		A          ;00以外ならERROR
-  212F  C28421        			JP		NZ,MERR
+  2125  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  2128  A7            			AND		A          ;00以外ならERROR
+  2129  C27E21        			JP		NZ,MERR
                       	
-  2132  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  2135  A7            			AND		A          ;00以外ならERROR
-  2136  C28421        			JP		NZ,MERR
+  212C  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  212F  A7            			AND		A          ;00以外ならERROR
+  2130  C27E21        			JP		NZ,MERR
                       	
-  2139  21F010        			LD		HL,IBUFE
-  213C  7E            			LD		A,(HL)
-  213D  FE05          			CP		05H				;FILE MODEが05ならBASIC TEXT START ADDRESSをSADRSにセット
-  213F  2006          			JR		NZ,MLD0
-  2141  2A7010        			LD		HL,(TEXTST)
-  2144  220411        			LD		(SADRS),HL
+  2133  21F010        			LD		HL,IBUFE
+  2136  7E            			LD		A,(HL)
+  2137  FE05          			CP		05H				;FILE MODEが05ならBASIC TEXT START ADDRESSをSADRSにセット
+  2139  2006          			JR		NZ,MLD0
+  213B  2A7010        			LD		HL,(TEXTST)
+  213E  220411        			LD		(SADRS),HL
                       	
-  2147  110211        	MLD0:	LD		DE,FSIZE   ;FSIZE送信
-  214A  1A            			LD		A,(DE)
-  214B  CD3420        			CALL	SNDBYTE
-  214E  13            			INC		DE
-  214F  1A            			LD		A,(DE)
-  2150  CD3420        			CALL	SNDBYTE
-  2153  CD5F21        			CALL	DBRCV      ;FSIZE分のデータを受信し、SADRSから格納。分割ロードの場合、直前に0436HでOPENされたファイルを対象として256バイトずつSADRSが加算されて04F8HがCALLされる。
+  2141  110211        	MLD0:	LD		DE,FSIZE   ;FSIZE送信
+  2144  1A            			LD		A,(DE)
+  2145  CD3420        			CALL	SNDBYTE
+  2148  13            			INC		DE
+  2149  1A            			LD		A,(DE)
+  214A  CD3420        			CALL	SNDBYTE
+  214D  CD5921        			CALL	DBRCV      ;FSIZE分のデータを受信し、SADRSから格納。分割ロードの場合、直前に0436HでOPENされたファイルを対象として256バイトずつSADRSが加算されて04F8HがCALLされる。
                       	
                       	;		LD		HL,IBUFE
                       	;		LD		A,(HL)
@@ -271,51 +268,51 @@
                       	;		CALL	679CH
                       	
                       	
-  2156  CD2120        	MLD1:	CALL	RCVBYTE    ;状態取得(00H=OK)
-  2159  A7            			AND		A          ;00以外ならERROR
-  215A  C28421        			JP		NZ,MERR
+  2150  CD2120        	MLD1:	CALL	RCVBYTE    ;状態取得(00H=OK)
+  2153  A7            			AND		A          ;00以外ならERROR
+  2154  C27E21        			JP		NZ,MERR
                       	
-  215D  1820          			JR		MRET       ;正常RETURN
+  2157  1820          			JR		MRET       ;正常RETURN
                       	
                       	;データ受信
-  215F  ED5B0211      	DBRCV:	LD		DE,(FSIZE)
-  2163  2A0411        			LD		HL,(SADRS)
-  2166  CD2120        	DBRLOP:	CALL	RCVBYTE
-  2169  77            			LD		(HL),A
-  216A  1B            			DEC		DE
-  216B  7A            			LD		A,D
-  216C  B3            			OR		E
-  216D  23            			INC		HL
-  216E  20F6          			JR		NZ,DBRLOP   ;DE=0までLOOP
-  2170  C9            			RET
+  2159  ED5B0211      	DBRCV:	LD		DE,(FSIZE)
+  215D  2A0411        			LD		HL,(SADRS)
+  2160  CD2120        	DBRLOP:	CALL	RCVBYTE
+  2163  77            			LD		(HL),A
+  2164  1B            			DEC		DE
+  2165  7A            			LD		A,D
+  2166  B3            			OR		E
+  2167  23            			INC		HL
+  2168  20F6          			JR		NZ,DBRLOP   ;DE=0までLOOP
+  216A  C9            			RET
                       	
                       	;************************** 0588H VRFY CMT ベリファイ代替処理 *******************
-  2171  AF            	MVRFY:	XOR		A          ;正常終了フラグ
-  2172  C9            			RET
+  216B  AF            	MVRFY:	XOR		A          ;正常終了フラグ
+  216C  C9            			RET
                       	
                       	;******* 代替処理用コマンドコード送信 (IN:A コマンドコード) **********
-  2173  F5            	MCMD:	PUSH	AF
-  2174  CD1620        			CALL	INIT
-  2177  F1            			POP		AF
-  2178  CD3420        			CALL	SNDBYTE    ;コマンドコード送信
-  217B  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  217E  C9            			RET
+  216D  F5            	MCMD:	PUSH	AF
+  216E  CD1620        			CALL	INIT
+  2171  F1            			POP		AF
+  2172  CD3420        			CALL	SNDBYTE    ;コマンドコード送信
+  2175  CD2120        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  2178  C9            			RET
                       	
                       	;****** 代替処理用正常RETURN処理 **********
-  217F  E1            	MRET:	POP		HL
-  2180  C1            			POP		BC
-  2181  D1            			POP		DE
-  2182  AF            			XOR		A
-  2183  C9            			RET
+  2179  E1            	MRET:	POP		HL
+  217A  C1            			POP		BC
+  217B  D1            			POP		DE
+  217C  AF            			XOR		A
+  217D  C9            			RET
                       	
                       	;******* 代替処理用ERROR処理 **************
-  2184                	MERR:
-  2184  E1            			POP		HL
-  2185  C1            			POP		BC
-  2186  D1            			POP		DE
-  2187  3E02          			LD		A,02H
-  2189  37            			SCF
-  218A  C9            			RET
+  217E                	MERR:
+  217E  E1            			POP		HL
+  217F  C1            			POP		BC
+  2180  D1            			POP		DE
+  2181  3E02          			LD		A,02H
+  2183  37            			SCF
+  2184  C9            			RET
                       			
-  218B                			END
+  2185                			END
 
