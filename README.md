@@ -608,3 +608,6 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 
 　　　　BASIC MZ-5Z001のAUTORUN対応SDパッチを公開しました。
 
+2024.8.6 BASIC MZ-5Z001のSD対応パッチ修正版にも不具合があるので調査中です。現在判っている範囲で修正。
+
+          LOADし実行までは問題ないが、別プログラムをLOADしようとすると固まってしまう。短いプログラム同士だと発生しないが、長いプログラムのLOAD実行後に発生するよう。
