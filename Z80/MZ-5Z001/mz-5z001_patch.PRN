@@ -1,38 +1,41 @@
 			  Z80 ASSEMBLER - ZASM VER 1.6
   A220                			ORG		0A220H
                       			
-  A220  210320        			LD		HL,2003H
-  A223  222200        			LD		(0022H),HL			;MSHED
-  A226  210620        			LD		HL,2006H
-  A229  222500        			LD		(0025H),HL			;MSDAT
-  A22C  210920        			LD		HL,2009H
-  A22F  222800        			LD		(0028H),HL			;MLHED
-  A232  210C20        			LD		HL,200CH
-  A235  222B00        			LD		(002BH),HL			;MLDAT
-  A238  210F20        			LD		HL,200FH
-  A23B  222E00        			LD		(002EH),HL			;VERIFY
-                      			
-  A23E  214128        			LD		HL,2841H
-  A241  22E30B        			LD		(0BE3H),HL			;DEFAULT CMT
-                      			
-  A244  210320        			LD		HL,2003H
-  A247  229C28        			LD		(289CH),HL			;MSHED
-  A24A  210620        			LD		HL,2006H
-  A24D  22A128        			LD		(28A1H),HL			;MSDAT
-  A250  210920        			LD		HL,2009H
-  A253  22B428        			LD		(28B4H),HL			;MLHED
-  A256  210C20        			LD		HL,200CH
-  A259  220829        			LD		(2908H),HL			;MLDAT
-  A25C  210F20        			LD		HL,200FH
-  A25F  229029        			LD		(2990H),HL			;VERIFY
-                      			
-  A262  2170A2        			LD		HL,ENT0
-  A265  110020        			LD		DE,2000H
-  A268  01A001        			LD		BC,01A0H
-  A26B  EDB0          			LDIR						;SD_ACCRESSルーチンを転送
+  A220  2115A2        			LD		HL,0A215H
+  A223  22DA10        			LD		(10DAH),HL
                       	
-  A26D  C30000        			JP		0000H
+  A226  210322        			LD		HL,2203H
+  A229  222200        			LD		(0022H),HL			;MSHED
+  A22C  210622        			LD		HL,2206H
+  A22F  222500        			LD		(0025H),HL			;MSDAT
+  A232  210922        			LD		HL,2209H
+  A235  222800        			LD		(0028H),HL			;MLHED
+  A238  210C22        			LD		HL,220CH
+  A23B  222B00        			LD		(002BH),HL			;MLDAT
+  A23E  210F22        			LD		HL,220FH
+  A241  222E00        			LD		(002EH),HL			;VERIFY
+                      			
+  A244  214128        			LD		HL,2841H
+  A247  22E30B        			LD		(0BE3H),HL			;DEFAULT CMT
+                      			
+  A24A  210322        			LD		HL,2203H
+  A24D  229C28        			LD		(289CH),HL			;MSHED
+  A250  210622        			LD		HL,2206H
+  A253  22A128        			LD		(28A1H),HL			;MSDAT
+  A256  210922        			LD		HL,2209H
+  A259  22B428        			LD		(28B4H),HL			;MLHED
+  A25C  210C22        			LD		HL,220CH
+  A25F  220829        			LD		(2908H),HL			;MLDAT
+  A262  210F22        			LD		HL,220FH
+  A265  229029        			LD		(2990H),HL			;VERIFY
+                      			
+  A268  2176A2        			LD		HL,ENT0
+  A26B  110022        			LD		DE,2200H
+  A26E  01A001        			LD		BC,01A0H
+  A271  EDB0          			LDIR						;SD_ACCRESSルーチンを転送
                       	
-  A270                	ENT0:								;mz-5z001_SD_ACCRESSのバイナリをここに連結
-  A270                			END
+  A273  C30000        			JP		0000H
+                      	
+  A276                	ENT0:								;mz-5z001_SD_ACCRESSのバイナリをここに連結
+  A276                			END
 

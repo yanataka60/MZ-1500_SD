@@ -29,7 +29,7 @@ TMPEND		EQU		107AH
 ;0A3H コントロールレジスタ
 
 
-		ORG		2000H
+		ORG		2200H
 
 		JP		START
 ;******************** MONITOR CMTルーチン代替 *************************************
@@ -112,6 +112,7 @@ MSHED:
 		PUSH	DE
 		PUSH	BC
 		PUSH	HL
+
 		LD		A,91H      ;HEADER SAVEコマンド91H
 		CALL	MCMD       ;コマンドコード送信
 		AND		A          ;00以外ならERROR
@@ -176,6 +177,7 @@ MLHED:
 		PUSH	DE
 		PUSH	BC
 		PUSH	HL
+
 		LD		A,93H      ;HEADER LOADコマンド93H
 		CALL	MCMD       ;コマンドコード送信
 		AND		A          ;00以外ならERROR
@@ -250,6 +252,9 @@ MLDAT:
 		LD		HL,(TEXTST)
 		LD		(SADRS),HL
 
+;		LD		HL,(FSIZE)
+;		LD		(10E8H),HL
+
 MLD0:	LD		DE,FSIZE   ;FSIZE送信
 		LD		A,(DE)
 		CALL	SNDBYTE
@@ -257,14 +262,6 @@ MLD0:	LD		DE,FSIZE   ;FSIZE送信
 		LD		A,(DE)
 		CALL	SNDBYTE
 		CALL	DBRCV      ;FSIZE分のデータを受信し、SADRSから格納。分割ロードの場合、直前に0436HでOPENされたファイルを対象として256バイトずつSADRSが加算されて04F8HがCALLされる。
-
-;		LD		HL,IBUFE
-;		LD		A,(HL)
-;		CP		05H				;FILE MODEが05ならBASIC TEXT END ADDRESSをTEXTEDにセット
-;		JR		NZ,MLD1
-
-;		CALL	67BFH
-;		CALL	679CH
 
 
 MLD1:	CALL	RCVBYTE    ;状態取得(00H=OK)
