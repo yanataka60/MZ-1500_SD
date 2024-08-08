@@ -369,9 +369,9 @@ NEW NAME:TEST2[CR]
 
 　バイナリエディタで先頭の1Byteを「02」から「05」に修正すればCMT用となり、SDから読込めるようになります。
 
-##### LOAD"xxxx",A、SAVE"xxxx",A、RUN"xxxx",Aのアスキー形式でのLOAD、SAVE、RUN及びRUN"xxxx",Rでの実行は出来ません。実行すると暴走するので実行しないでください。
+##### LOAD"xxxx",A、SAVE"xxxx",A、RUN"xxxx",Aのアスキー形式でのLOAD、SAVEの実行は出来ません。実行すると暴走するので実行しないでください。
 
-　RUN"xxxx"コマンドでSDから読込後即実行も可能です。
+　RUN"xxxx"及びRUN"xxxx",RコマンドでSDから読込後即実行は可能です。
 
 #### ファイル名について
 
