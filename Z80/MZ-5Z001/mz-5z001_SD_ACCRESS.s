@@ -1,11 +1,18 @@
 ELMD		EQU		1000H
 LNAME		EQU		1001H
 LSIZE		EQU		1014H
+GETL		EQU		0003H
+LETLN		EQU		0006H
+MSGPR		EQU		0015H
+GETKEY		EQU		001BH
+BRKCHK		EQU		001EH
 IBUFE		EQU		10F0H
 FNAME		EQU		10F1H
 FSIZE		EQU		1102H
 SADRS		EQU		1104H
+DSPX		EQU		0054H
 LBUF		EQU		11A4H
+MBUF		EQU		11AEH
 TEXTST		EQU		1070H
 TEXTED		EQU		1072H
 VARST		EQU		1074H
@@ -56,10 +63,10 @@ INIT2:	LD		A,00H      ;PORTA <- 0
 ;受信DATAをAレジスタにセットしてリターン
 RCVBYTE:
 		CALL	F1CHK      ;PORTC BIT7が1になるまでLOOP
-		LD		A,05H
-		OUT		(0A3H),A    ;PORTC BIT2 <- 1
 		IN		A,(0A1H)   ;PORTB -> A
 		PUSH 	AF
+		LD		A,05H
+		OUT		(0A3H),A    ;PORTC BIT2 <- 1
 		CALL	F2CHK      ;PORTC BIT7が0になるまでLOOP
 		LD		A,04H
 		OUT		(0A3H),A    ;PORTC BIT2 <- 0
@@ -107,16 +114,21 @@ F2CHK:	IN		A,(0A2H)
 		JR		NZ,F2CHK
 		RET
 
+;**** コマンド送信 (IN:A コマンドコード)****
+STCD:	CALL	SNDBYTE    ;Aレジスタのコマンドコードを送信
+		CALL	RCVBYTE    ;状態取得(00H=OK)
+		RET
+
 ;*********************** 0436H MONITOR ライト インフォメーション代替処理 ************
 MSHED:
 		PUSH	DE
 		PUSH	BC
 		PUSH	HL
-
+		CALL	INIT
 		LD		A,91H      ;HEADER SAVEコマンド91H
 		CALL	MCMD       ;コマンドコード送信
 		AND		A          ;00以外ならERROR
-		JP		NZ,MERR
+		JR		NZ,MERR
 
 		LD		HL,IBUFE
 		LD		B,80H
@@ -127,9 +139,9 @@ MSH1:	LD		A,(HL)     ;インフォメーション ブロック送信
 
 		CALL	RCVBYTE    ;状態取得(00H=OK)
 		AND		A          ;00以外ならERROR
-		JP		NZ,MERR
+		JR		NZ,MERR
 
-		JP		MRET       ;正常RETURN
+		JR		MRET       ;正常RETURN
 
 ;******************** 0475H MONITOR ライト データ代替処理 **********************
 MSDAT:
@@ -139,7 +151,7 @@ MSDAT:
 		LD		A,92H      ;DATA SAVEコマンド92H
 		CALL	MCMD       ;コマンドコード送信
 		AND		A          ;00以外ならERROR
-		JP		NZ,MERR
+		JR		NZ,MERR
 
 		LD		HL,FSIZE   ;FSIZE送信
 		LD		A,(HL)
@@ -150,7 +162,7 @@ MSDAT:
 
 		CALL	RCVBYTE    ;状態取得(00H=OK)
 		AND		A          ;00以外ならERROR
-		JP		NZ,MERR
+		JR		NZ,MERR
 
 		LD		HL,IBUFE
 		LD		A,(HL)
@@ -170,34 +182,118 @@ MSD1:	LD		A,(HL)
 		INC		HL
 		JR		NZ,MSD1
 		
-		JP		MRET       ;正常RETURN
+;		JR		MRET       ;正常RETURN
 
+;****** 代替処理用正常RETURN処理 **********
+MRET:	POP		HL
+		POP		BC
+		POP		DE
+		XOR		A
+		RET
+
+;******* 代替処理用ERROR処理 **************
+MERR:
+		CP		0F0H
+		JR		NZ,MERR3
+		LD		DE,MSG_F0
+		JR		MERRMSG
+		
+MERR3:	CP		0F1H
+		JR		NZ,MERR99
+		LD		DE,MSG_F1
+		JR		MERRMSG
+		
+MERR99:
+		LD		DE,MSG99
+		
+MERRMSG:
+		CALL	MSGPR
+		CALL	LETLN
+		POP		HL
+		POP		BC
+		POP		DE
+		LD		A,02H
+		SCF
+		RET
+		
 ;************************** 04D8H MONITOR リード インフォメーション代替処理 *****************
 MLHED:
 		PUSH	DE
 		PUSH	BC
 		PUSH	HL
+		CALL	INIT
+
+		LD		A,(LNAME)	;ファイル名が指定されていればそのまま送信、指定されていなければ入力処理へ
+		CP		0DH
+		JR		Z,MLH10
+		
+		LD		A,93H      ;HEADER LOADコマンド93H
+		CALL	MCMD       ;コマンドコード送信
+		AND		A          ;00以外ならERROR
+		JR		NZ,MERR
+
+		LD		DE,LNAME
+
+		LD		B,10H
+MLN4:	LD		A,(DE)     ;FNAME送信
+		CALL	SNDBYTE
+		INC		DE
+		DJNZ	MLN4
+
+		LD		B,11H
+MLN3:	LD		A,0DH
+		CALL	SNDBYTE
+		DJNZ	MLN3
+
+		JR		MLN5
+
+MLH10:	LD		B,08H      ;LBUFを0DHで埋めファイルネームが指定されなかったことにする
+		LD		DE,LBUF
+		LD		A,0DH
+MLH0:	LD		(DE),A
+		INC		DE
+		DJNZ	MLH0
+
+MLH6:	LD		DE,MSG_DNAME   ;'DOS FILE:'
+		CALL	MSGPR
+		LD		A,09H          ;カーソルを9文字目に戻す
+		LD		(DSPX),A
+
+		LD		DE,MBUF    ;ファイルネームを指示するための苦肉の策。LOADコマンドとしてはファイルネームなしとして改行したのちに行バッファの位置をずらしてDOSファイルネームを入力する。
+		CALL	GETL
+		
+		LD		DE,MBUF+9
+		
+		LD		A,(DE)
+;**** ファイルネームの先頭が'*'なら拡張コマンド処理へ移行 ****
+		CP		'*'
+		JR		Z,MLHCMD
 
 		LD		A,93H      ;HEADER LOADコマンド93H
 		CALL	MCMD       ;コマンドコード送信
 		AND		A          ;00以外ならERROR
-		JP		NZ,MERR
+		JR		NZ,MERR
 
-		
-		LD		DE,LNAME
+MLH1:
+		LD		A,(DE)
+		CP		20H                 ;行頭のスペースをファイルネームまで読み飛ばし
+		JR		NZ,MLH2
+		INC		DE
+		JR		MLH1
 
-MLH2:	LD		B,10H
+MLH2:	LD		B,20H
 MLH4:	LD		A,(DE)     ;FNAME送信
+		CP		20H
+		JR		NC,MLH3
+		LD		A,0DH
+MLH3:
 		CALL	SNDBYTE
 		INC		DE
 		DJNZ	MLH4
-
-		LD		B,11H
-MLH3:	LD		A,0DH
+		LD		A,0DH
 		CALL	SNDBYTE
-		DJNZ	MLH3
-
-		CALL	RCVBYTE    ;状態取得(00H=OK)
+		
+MLN5:	CALL	RCVBYTE    ;状態取得(00H=OK)
 		AND		A          ;00以外ならERROR
 		JP		NZ,MERR
 
@@ -225,7 +321,88 @@ MLH7:	LD		A,(DE)
 		INC		HL
 		DJNZ	MLH7
 		
-		JR		MRET       ;正常RETURN
+		JP		MRET       ;正常RETURN
+
+;**************************** アプリケーション内SD-CARD操作処理 **********************
+MLHCMD:
+;**** HL、DE、BCレジスタを保存 ****
+		PUSH	HL
+		PUSH	DE
+		PUSH	BC
+		INC		DE
+		LD		B,03H
+;**** FDLコマンド ****
+		LD		HL,CMD1
+		CALL	CMPSTR
+		JR		Z,MLHCMD2
+		POP		BC
+		POP		DE
+		POP		HL
+;**** ファイルネーム入力へ復帰 ****
+		JP		MLH6
+
+MLHCMD2:
+		INC		DE
+		INC		DE
+		INC		DE
+		LD		HL,MSG_DNAME         ;行頭に'DOS FILE:'を付けることでカーソルを移動させリターンで実行できるように
+		LD		BC,MSG_DNAMEEND-MSG_DNAME
+;**** FDLコマンド呼び出し ****
+		CALL	DIRLIST
+		AND		A          ;00以外ならERROR
+		JR		NZ,SERR
+		POP		BC
+		POP		DE
+		POP		HL
+;**** ファイルネーム入力へ復帰 ****
+		JP		MLH6
+
+;******* アプリケーション内SD-CARD操作処理用ERROR処理 **************
+SERR:
+		CP		0F0H
+		JR		NZ,SERR3
+		LD		DE,MSG_F0
+		JR		SERRMSG
+		
+SERR3:	CP		0F1H
+		JR		NZ,SERR99
+		LD		DE,MSG_F1
+		JR		SERRMSG
+		
+SERR99:
+		LD		DE,MSG99
+		
+SERRMSG:
+		CALL	MSGPR
+		CALL	LETLN
+		POP		BC
+		POP		DE
+		POP		HL
+;**** ファイルネーム入力へ復帰 ****
+		JP		MLH6
+
+;**** コマンド文字列比較 ****
+CMPSTR:
+		PUSH	BC
+		PUSH	DE
+CMP1:	LD		A,(DE)
+		CP		(HL)
+		JR		NZ,CMP2
+		DEC		B
+		JR		Z,CMP2
+		CP		0Dh
+		JR		Z,CMP2
+		INC		DE
+		INC		HL
+		JR		CMP1
+CMP2:	POP		DE
+		POP		BC
+		RET
+
+;**** コマンドリスト ****
+; 将来拡張用
+CMD1:	DB		'FDL',0DH
+
 
 ;**************************** 04F8H MONITOR リード データ代替処理 ********************
 MLDAT:
@@ -268,7 +445,7 @@ MLD1:	CALL	RCVBYTE    ;状態取得(00H=OK)
 		AND		A          ;00以外ならERROR
 		JP		NZ,MERR
 
-		JR		MRET       ;正常RETURN
+		JP		MRET       ;正常RETURN
 
 ;データ受信
 DBRCV:	LD		DE,(FSIZE)
@@ -286,6 +463,119 @@ DBRLOP:	CALL	RCVBYTE
 MVRFY:	XOR		A          ;正常終了フラグ
 		RET
 
+
+;**** DIRLIST本体 (HL=行頭に付加する文字列の先頭アドレス BC=行頭に付加する文字列の長さ) ****
+;****              戻り値 A=エラーコード ****
+DIRLIST:
+		LD		A,83H      ;DIRLISTコマンド83Hを送信
+		CALL	STCD       ;コマンドコード送信
+		AND		A          ;00以外ならERROR
+		JR		NZ,DLRET
+		
+		PUSH	BC
+		LD		B,21H
+STLT1:	LD		A,(DE)
+		CP		0DH
+		JR		NZ,STLT2
+		LD		A,00H
+STLT2:	CALL	SNDBYTE           ;ページ指示を送信
+		INC		DE
+		DJNZ	STLT1
+		POP		BC
+DL1:
+		PUSH	HL
+		PUSH	BC
+		LD		DE,LBUF
+		LDIR
+		EX		DE,HL
+DL2:	CALL	RCVBYTE           ;'00H'を受信するまでを一行とする
+		CP		00H
+		JR		Z,DL3
+		CP		0FFH              ;'0FFH'を受信したら終了
+		JR		Z,DL4
+		CP		0FEH              ;'0FEH'を受信したら一時停止して一文字入力待ち
+		JR		Z,DL5
+		LD		(HL),A
+		INC		HL
+		JR		DL2
+DL3:
+		LD		(HL),A
+		LD		DE,LBUF           ;'00H'を受信したら一行分を表示して改行
+		CALL	MSGPR
+;		CALL	LETLN
+		POP		BC
+		POP		HL
+		JR		DL1
+DL4:	CALL	RCVBYTE           ;状態取得(00H=OK)
+		POP		BC
+		POP		HL
+		JR		DLRET
+
+DL5:	LD		DE,MSG_KEY1        ;HIT ANT KEY表示
+		CALL	MSGPR
+
+		LD		A,12H              ;上矢印文字を表示
+		RST		18H
+		DB		04H
+
+		LD		DE,MSG_KEY2        ;HIT ANT KEY表示
+		CALL	MSGPR
+		CALL	LETLN
+DL6:	CALL	GETKEY            ;1文字入力待ち
+		CP		00H
+		JR		Z,DL6
+		CP		12H               ;カーソル↑で打ち切り
+		JR		Z,DL9
+		CP		42H               ;「B」で前ページ
+		JR		Z,DL8
+
+		CALL	BRKCHK
+		JR		Z,DL7             ;SHIFT+BREAKで打ち切り
+
+		LD		A,00H             ;それ以外で継続
+		JR		DL8
+DL9:
+		LD		A,12H             ;カーソル↑で打ち切ったときにカーソル2行上へ
+		RST		18H
+		DB		03H
+		LD		A,12H
+		RST		18H
+		DB		03H
+DL7:	LD		A,0FFH            ;0FFH中断コードを送信
+DL8:	CALL	SNDBYTE
+		CALL	LETLN
+		JR		DL2
+		
+DLRET:		
+		RET
+		
+
+;******** MESSAGE DATA ********************
+MSG_F0:
+		DB		'SD-CARD INITIALIZE ERROR'
+		DB		00H
+		
+MSG_F1:
+		DB		'NOT FIND FILE'
+		DB		00H
+		
+MSG_KEY1:
+		DB		'NEXT:ANY BACK:B BREAK:'
+		DB		00H
+MSG_KEY2:
+		DB		' OR SHIFT+BREAK'
+		DB		00H
+		
+MSG_DNAME:
+		DB		'DOS FILE:'
+MSG_DNAMEEND:
+		DB		'                            '
+		DB		00H
+
+MSG99:
+		DB		'UNKNOWN ERROR'
+		DB		00H
+
 ;******* 代替処理用コマンドコード送信 (IN:A コマンドコード) **********
 MCMD:	PUSH	AF
 		CALL	INIT
@@ -294,20 +584,4 @@ MCMD:	PUSH	AF
 		CALL	RCVBYTE    ;状態取得(00H=OK)
 		RET
 
-;****** 代替処理用正常RETURN処理 **********
-MRET:	POP		HL
-		POP		BC
-		POP		DE
-		XOR		A
-		RET
-
-;******* 代替処理用ERROR処理 **************
-MERR:
-		POP		HL
-		POP		BC
-		POP		DE
-		LD		A,02H
-		SCF
-		RET
-		
 		END

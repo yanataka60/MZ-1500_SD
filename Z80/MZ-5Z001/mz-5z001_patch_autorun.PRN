@@ -36,7 +36,7 @@
                       			
   A273  2181A2        			LD		HL,ENT0
   A276  110022        			LD		DE,2200H
-  A279  01A001        			LD		BC,01A0H
+  A279  015E03        			LD		BC,035EH
   A27C  EDB0          			LDIR						;SD_ACCRESSルーチンを転送
                       	
   A27E  C30000        			JP		0000H

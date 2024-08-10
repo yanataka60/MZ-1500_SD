@@ -30,7 +30,7 @@
 		
 		LD		HL,ENT0
 		LD		DE,2200H
-		LD		BC,01A0H
+		LD		BC,035EH
 		LDIR						;SD_ACCRESSルーチンを転送
 
 		JP		0000H

@@ -31,7 +31,7 @@
                       			
   A268  2176A2        			LD		HL,ENT0
   A26B  110022        			LD		DE,2200H
-  A26E  01A001        			LD		BC,01A0H
+  A26E  015E03        			LD		BC,035EH
   A271  EDB0          			LDIR						;SD_ACCRESSルーチンを転送
                       	
   A273  C30000        			JP		0000H
