@@ -323,6 +323,7 @@ NEW NAME:TEST2[CR]
 
 ### MZ-1500用BASIC MZ-5Z001
 
+##### 2024.8.10 LOAD時の特殊コマンド「*FDL」を使えるようにしました。これによりLOADコマンドの使い方が若干変わっています。
 　MZ-5Z001をイメージ化したmztファイルが必要です。
 
 　MZ-5Z001のイメージ化については簡単に書きますので詳細はWebで検索ください。
@@ -331,9 +332,9 @@ NEW NAME:TEST2[CR]
 
 　MZ-5Z001.mztをバイナリエディタで開きます。ファイルの最後はA295hですが、A29Fhまで00hで埋めます。(もしかしたらバージョン違いでA295hではないかもしれませんが、A29Fhまで00hで埋められれば大丈夫だと思います。)
 
-　Z80フォルダ中MZ-5Z001フォルダにある「mz-5z001_BOOT.bin」をMZ-5Z001.mztの後ろ(A2A0h～)に付加します。ファイルサイズ42115Byteになります。
+　Z80フォルダ中MZ-5Z001フォルダにある「mz-5z001_BOOT.bin」をMZ-5Z001.mztの後ろ(A2A0h～)に付加します。ファイルサイズ42581Byteになります。
 
-　MZ-5Z001.mztのヘッダを修正し、ファイルサイズをA403h、実行アドレスをA220hとします。
+　MZ-5Z001.mztのヘッダを修正し、ファイルサイズをA5D5h、実行アドレスをA220hとします。
 
 　![MZ-5Z001](https://github.com/yanataka60/MZ-1500_SD/blob/main/JPEG/MZ-5Z001.jpg)
 
@@ -344,9 +345,9 @@ NEW NAME:TEST2[CR]
 
 　MZ-5Z001.mztをバイナリエディタで開き、A29Fhまで00hで埋めるところまでは同じです。
 
-　Z80フォルダ中MZ-5Z001フォルダにある「mz-5z001_BOOT_AUTORUN.bin」をMZ-5Z001.mztの後ろ(A2A0h～)に付加します。ファイルサイズ42126Byteになります。
+　Z80フォルダ中MZ-5Z001フォルダにある「mz-5z001_BOOT_AUTORUN.bin」をMZ-5Z001.mztの後ろ(A2A0h～)に付加します。ファイルサイズ42592Byteになります。
 
-　MZ-5Z001.mztのヘッダを修正し、ファイルサイズをA40Eh、実行アドレスをA220hとします。
+　MZ-5Z001.mztのヘッダを修正し、ファイルサイズをA5E0h、実行アドレスをA220hとします。
 
 　![MZ-5Z001_AUTORUN](https://github.com/yanataka60/MZ-1500_SD/blob/main/JPEG/MZ-5Z001_AUTORUN.jpg)
 
@@ -392,6 +393,22 @@ NEW NAME:TEST2[CR]
 　LOAD "TEST"     : TEST.MZTというDOSファイル名のファイルがロードされます。
 
 　DOSファイル名が「TEST SBASIC EIGHT.MZT」の場合、LOAD "TEST SBASIC EIGHT"と入力しても「TEST SBASIC EIGH.MZT」というDOSファイルを探しに行くためロードできません。
+
+#### LOAD時の特殊コマンド
+　LOADに続けてファイル名を指定した場合は今まで通り指定したファイル名のプログラムがSDから読み込まれますが、ファイル名を指定せずにLOADだけで実行した場合は、「DOS FILE:」と表示して行入力待ちになります。
+
+　このとき入力できるDOSファイル名は「.MZT」を除いて32文字までとなります。
+
+　ただし半角カタカナ、及び一部の記号はArduinoが認識しないので使えません。パソコンでファイル名を付けるときはアルファベット、数字および空白でファイル名をつけてください。
+
+　またファイル名ではなく以下の特殊コマンドが使用可能となります。
+
+##### *FDL[CR]
+##### *FDL x[CR]
+　MONITORコマンド入力待ちからのFDL、FDL xと全く同等のファイル一覧機能が使えます。
+
+　検索結果の行頭には「DOS FILE:」を付加して表示してあるのでLOADしたいファイルにカーソルキーを合わせて[CR]キーを押すだけでLOADが可能です。
+
 
 ### MZ-700用S-BASIC 1Z-007B
 　Z80フォルダ中SBASIC PATCHフォルダにあるSBASIC_patch1.bin、SBASIC_patch2.binの二つをS-BASICのMZTファイルに当てます。
@@ -614,3 +631,5 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 　　　　　　LOADし実行までは問題ないが、別プログラムをLOADしようとすると固まってしまう。短いプログラム同士だと発生しないが、長いプログラムのLOAD実行後に発生するよう。
 
 2024.8.8 BASIC MZ-5Z001のSD対応パッチを更新しました。
+
+2024.8.10 BASIC MZ-5Z001のLOADコマンドで「*FDL」を使えるようにした。
