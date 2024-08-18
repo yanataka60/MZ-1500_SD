@@ -1,3 +1,5 @@
+;2024.8.18 MSDAT、MLDATへのパラメータSADRS、FSIZEがHL、BCレジスタを使っていることが判明したため修正
+
 ELMD		EQU		1000H
 LNAME		EQU		1001H
 LSIZE		EQU		1014H
@@ -153,32 +155,20 @@ MSDAT:
 		AND		A          ;00以外ならERROR
 		JR		NZ,MERR
 
-		LD		HL,FSIZE   ;FSIZE送信
-		LD		A,(HL)
+		LD		A,C        ;FSIZE送信
 		CALL	SNDBYTE
-		INC		HL
-		LD		A,(HL)
+		LD		A,B        ;FSIZE送信
 		CALL	SNDBYTE
 
 		CALL	RCVBYTE    ;状態取得(00H=OK)
 		AND		A          ;00以外ならERROR
 		JR		NZ,MERR
 
-		LD		HL,IBUFE
-		LD		A,(HL)
-		CP		05H				;FILE MODEが05ならBASIC TEXT START ADDRESSをSADRSにセット
-		JR		NZ,MSD0
-		
-		LD		HL,(TEXTST)
-		LD		(SADRS),HL
-
-MSD0:	LD		DE,(FSIZE)
-		LD		HL,(SADRS)
 MSD1:	LD		A,(HL)
 		CALL	SNDBYTE      ;SADRSからFSIZE Byteを送信。分割セーブの場合、直前に0436HでOPENされたファイルを対象として256バイトずつ0475HがCALLされる。
-		DEC		DE
-		LD		A,D
-		OR		E
+		DEC		BC
+		LD		A,B
+		OR		C
 		INC		HL
 		JR		NZ,MSD1
 		
@@ -422,21 +412,9 @@ MLDAT:
 		AND		A          ;00以外ならERROR
 		JP		NZ,MERR
 
-		LD		HL,IBUFE
-		LD		A,(HL)
-		CP		05H				;FILE MODEが05ならBASIC TEXT START ADDRESSをSADRSにセット
-		JR		NZ,MLD0
-		LD		HL,(TEXTST)
-		LD		(SADRS),HL
-
-;		LD		HL,(FSIZE)
-;		LD		(10E8H),HL
-
-MLD0:	LD		DE,FSIZE   ;FSIZE送信
-		LD		A,(DE)
+		LD		A,C        ;FSIZE送信
 		CALL	SNDBYTE
-		INC		DE
-		LD		A,(DE)
+		LD		A,B        ;FSIZE送信
 		CALL	SNDBYTE
 		CALL	DBRCV      ;FSIZE分のデータを受信し、SADRSから格納。分割ロードの場合、直前に0436HでOPENされたファイルを対象として256バイトずつSADRSが加算されて04F8HがCALLされる。
 
@@ -448,13 +426,12 @@ MLD1:	CALL	RCVBYTE    ;状態取得(00H=OK)
 		JP		MRET       ;正常RETURN
 
 ;データ受信
-DBRCV:	LD		DE,(FSIZE)
-		LD		HL,(SADRS)
+DBRCV:
 DBRLOP:	CALL	RCVBYTE
 		LD		(HL),A
-		DEC		DE
-		LD		A,D
-		OR		E
+		DEC		BC
+		LD		A,B
+		OR		C
 		INC		HL
 		JR		NZ,DBRLOP   ;DE=0までLOOP
 		RET

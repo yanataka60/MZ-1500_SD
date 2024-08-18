@@ -1,4 +1,6 @@
 			  Z80 ASSEMBLER - ZASM VER 1.6
+                      	;2024.8.18 MSDAT、MLDATへのパラメータSADRS、FSIZEがHL、BCレジスタを使っていることが判明したため修正
+                      	
   1000                	ELMD		EQU		1000H
   1001                	LNAME		EQU		1001H
   1014                	LSIZE		EQU		1014H
@@ -43,9 +45,9 @@
                       	;******************** MONITOR CMTルーチン代替 *************************************
   2203  C36B22        	ENT1:	JP		MSHED
   2206  C38D22        	ENT2:	JP		MSDAT
-  2209  C3F022        	ENT3:	JP		MLHED
-  220C  C3F823        	ENT4:	JP		MLDAT
-  220F  C34B24        	ENT5:	JP		MVRFY
+  2209  C3D722        	ENT3:	JP		MLHED
+  220C  C3DF23        	ENT4:	JP		MLDAT
+  220F  C31924        	ENT5:	JP		MVRFY
                       			
   2212  CD1622        	START:	CALL	INIT
   2215  C9            			RET
@@ -127,9 +129,9 @@
   226D  E5            			PUSH	HL
   226E  CD1622        			CALL	INIT
   2271  3E91          			LD		A,91H      ;HEADER SAVEコマンド91H
-  2273  CD5325        			CALL	MCMD       ;コマンドコード送信
+  2273  CD2125        			CALL	MCMD       ;コマンドコード送信
   2276  A7            			AND		A          ;00以外ならERROR
-  2277  2055          			JR		NZ,MERR
+  2277  203C          			JR		NZ,MERR
                       	
   2279  21F010        			LD		HL,IBUFE
   227C  0680          			LD		B,80H
@@ -140,9 +142,9 @@
                       	
   2285  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
   2288  A7            			AND		A          ;00以外ならERROR
-  2289  2043          			JR		NZ,MERR
+  2289  202A          			JR		NZ,MERR
                       	
-  228B  183C          			JR		MRET       ;正常RETURN
+  228B  1823          			JR		MRET       ;正常RETURN
                       	
                       	;******************** 0475H MONITOR ライト データ代替処理 **********************
   228D                	MSDAT:
@@ -150,440 +152,415 @@
   228E  C5            			PUSH	BC
   228F  E5            			PUSH	HL
   2290  3E92          			LD		A,92H      ;DATA SAVEコマンド92H
-  2292  CD5325        			CALL	MCMD       ;コマンドコード送信
+  2292  CD2125        			CALL	MCMD       ;コマンドコード送信
   2295  A7            			AND		A          ;00以外ならERROR
-  2296  2036          			JR		NZ,MERR
+  2296  201D          			JR		NZ,MERR
                       	
-  2298  210211        			LD		HL,FSIZE   ;FSIZE送信
-  229B  7E            			LD		A,(HL)
-  229C  CD3422        			CALL	SNDBYTE
-  229F  23            			INC		HL
-  22A0  7E            			LD		A,(HL)
-  22A1  CD3422        			CALL	SNDBYTE
+  2298  79            			LD		A,C        ;FSIZE送信
+  2299  CD3422        			CALL	SNDBYTE
+  229C  78            			LD		A,B        ;FSIZE送信
+  229D  CD3422        			CALL	SNDBYTE
                       	
-  22A4  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  22A7  A7            			AND		A          ;00以外ならERROR
-  22A8  2024          			JR		NZ,MERR
+  22A0  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  22A3  A7            			AND		A          ;00以外ならERROR
+  22A4  200F          			JR		NZ,MERR
                       	
-  22AA  21F010        			LD		HL,IBUFE
-  22AD  7E            			LD		A,(HL)
-  22AE  FE05          			CP		05H				;FILE MODEが05ならBASIC TEXT START ADDRESSをSADRSにセット
-  22B0  2006          			JR		NZ,MSD0
-                      			
-  22B2  2A7010        			LD		HL,(TEXTST)
-  22B5  220411        			LD		(SADRS),HL
-                      	
-  22B8  ED5B0211      	MSD0:	LD		DE,(FSIZE)
-  22BC  2A0411        			LD		HL,(SADRS)
-  22BF  7E            	MSD1:	LD		A,(HL)
-  22C0  CD3422        			CALL	SNDBYTE      ;SADRSからFSIZE Byteを送信。分割セーブの場合、直前に0436HでOPENされたファイルを対象として256バイトずつ0475HがCALLされる。
-  22C3  1B            			DEC		DE
-  22C4  7A            			LD		A,D
-  22C5  B3            			OR		E
-  22C6  23            			INC		HL
-  22C7  20F6          			JR		NZ,MSD1
+  22A6  7E            	MSD1:	LD		A,(HL)
+  22A7  CD3422        			CALL	SNDBYTE      ;SADRSからFSIZE Byteを送信。分割セーブの場合、直前に0436HでOPENされたファイルを対象として256バイトずつ0475HがCALLされる。
+  22AA  0B            			DEC		BC
+  22AB  78            			LD		A,B
+  22AC  B1            			OR		C
+  22AD  23            			INC		HL
+  22AE  20F6          			JR		NZ,MSD1
                       			
                       	;		JR		MRET       ;正常RETURN
                       	
                       	;****** 代替処理用正常RETURN処理 **********
-  22C9  E1            	MRET:	POP		HL
-  22CA  C1            			POP		BC
-  22CB  D1            			POP		DE
-  22CC  AF            			XOR		A
-  22CD  C9            			RET
+  22B0  E1            	MRET:	POP		HL
+  22B1  C1            			POP		BC
+  22B2  D1            			POP		DE
+  22B3  AF            			XOR		A
+  22B4  C9            			RET
                       	
                       	;******* 代替処理用ERROR処理 **************
-  22CE                	MERR:
-  22CE  FEF0          			CP		0F0H
-  22D0  2005          			JR		NZ,MERR3
-  22D2  11D124        			LD		DE,MSG_F0
-  22D5  180C          			JR		MERRMSG
+  22B5                	MERR:
+  22B5  FEF0          			CP		0F0H
+  22B7  2005          			JR		NZ,MERR3
+  22B9  119F24        			LD		DE,MSG_F0
+  22BC  180C          			JR		MERRMSG
                       			
-  22D7  FEF1          	MERR3:	CP		0F1H
-  22D9  2005          			JR		NZ,MERR99
-  22DB  11EA24        			LD		DE,MSG_F1
-  22DE  1803          			JR		MERRMSG
+  22BE  FEF1          	MERR3:	CP		0F1H
+  22C0  2005          			JR		NZ,MERR99
+  22C2  11B824        			LD		DE,MSG_F1
+  22C5  1803          			JR		MERRMSG
                       			
-  22E0                	MERR99:
-  22E0  114525        			LD		DE,MSG99
+  22C7                	MERR99:
+  22C7  111325        			LD		DE,MSG99
                       			
-  22E3                	MERRMSG:
-  22E3  CD1500        			CALL	MSGPR
-  22E6  CD0600        			CALL	LETLN
-  22E9  E1            			POP		HL
-  22EA  C1            			POP		BC
-  22EB  D1            			POP		DE
-  22EC  3E02          			LD		A,02H
-  22EE  37            			SCF
-  22EF  C9            			RET
+  22CA                	MERRMSG:
+  22CA  CD1500        			CALL	MSGPR
+  22CD  CD0600        			CALL	LETLN
+  22D0  E1            			POP		HL
+  22D1  C1            			POP		BC
+  22D2  D1            			POP		DE
+  22D3  3E02          			LD		A,02H
+  22D5  37            			SCF
+  22D6  C9            			RET
                       			
                       	;************************** 04D8H MONITOR リード インフォメーション代替処理 *****************
-  22F0                	MLHED:
-  22F0  D5            			PUSH	DE
-  22F1  C5            			PUSH	BC
-  22F2  E5            			PUSH	HL
-  22F3  CD1622        			CALL	INIT
+  22D7                	MLHED:
+  22D7  D5            			PUSH	DE
+  22D8  C5            			PUSH	BC
+  22D9  E5            			PUSH	HL
+  22DA  CD1622        			CALL	INIT
                       	
-  22F6  3A0110        			LD		A,(LNAME)	;ファイル名が指定されていればそのまま送信、指定されていなければ入力処理へ
-  22F9  FE0D          			CP		0DH
-  22FB  281F          			JR		Z,MLH10
+  22DD  3A0110        			LD		A,(LNAME)	;ファイル名が指定されていればそのまま送信、指定されていなければ入力処理へ
+  22E0  FE0D          			CP		0DH
+  22E2  281F          			JR		Z,MLH10
                       			
-  22FD  3E93          			LD		A,93H      ;HEADER LOADコマンド93H
-  22FF  CD5325        			CALL	MCMD       ;コマンドコード送信
-  2302  A7            			AND		A          ;00以外ならERROR
-  2303  20C9          			JR		NZ,MERR
+  22E4  3E93          			LD		A,93H      ;HEADER LOADコマンド93H
+  22E6  CD2125        			CALL	MCMD       ;コマンドコード送信
+  22E9  A7            			AND		A          ;00以外ならERROR
+  22EA  20C9          			JR		NZ,MERR
                       	
-  2305  110110        			LD		DE,LNAME
+  22EC  110110        			LD		DE,LNAME
                       	
-  2308  0610          			LD		B,10H
-  230A  1A            	MLN4:	LD		A,(DE)     ;FNAME送信
-  230B  CD3422        			CALL	SNDBYTE
-  230E  13            			INC		DE
-  230F  10F9          			DJNZ	MLN4
+  22EF  0610          			LD		B,10H
+  22F1  1A            	MLN4:	LD		A,(DE)     ;FNAME送信
+  22F2  CD3422        			CALL	SNDBYTE
+  22F5  13            			INC		DE
+  22F6  10F9          			DJNZ	MLN4
                       	
-  2311  0611          			LD		B,11H
-  2313  3E0D          	MLN3:	LD		A,0DH
-  2315  CD3422        			CALL	SNDBYTE
-  2318  10F9          			DJNZ	MLN3
+  22F8  0611          			LD		B,11H
+  22FA  3E0D          	MLN3:	LD		A,0DH
+  22FC  CD3422        			CALL	SNDBYTE
+  22FF  10F9          			DJNZ	MLN3
                       	
-  231A  1848          			JR		MLN5
+  2301  1848          			JR		MLN5
                       	
-  231C  0608          	MLH10:	LD		B,08H      ;LBUFを0DHで埋めファイルネームが指定されなかったことにする
-  231E  11A411        			LD		DE,LBUF
-  2321  3E0D          			LD		A,0DH
-  2323  12            	MLH0:	LD		(DE),A
-  2324  13            			INC		DE
-  2325  10FC          			DJNZ	MLH0
+  2303  0608          	MLH10:	LD		B,08H      ;LBUFを0DHで埋めファイルネームが指定されなかったことにする
+  2305  11A411        			LD		DE,LBUF
+  2308  3E0D          			LD		A,0DH
+  230A  12            	MLH0:	LD		(DE),A
+  230B  13            			INC		DE
+  230C  10FC          			DJNZ	MLH0
                       	
-  2327  111F25        	MLH6:	LD		DE,MSG_DNAME   ;'DOS FILE:'
-  232A  CD1500        			CALL	MSGPR
-  232D  3E09          			LD		A,09H          ;カーソルを9文字目に戻す
-  232F  325400        			LD		(DSPX),A
+  230E  11ED24        	MLH6:	LD		DE,MSG_DNAME   ;'DOS FILE:'
+  2311  CD1500        			CALL	MSGPR
+  2314  3E09          			LD		A,09H          ;カーソルを9文字目に戻す
+  2316  325400        			LD		(DSPX),A
                       	
-  2332  11AE11        			LD		DE,MBUF    ;ファイルネームを指示するための苦肉の策。LOADコマンドとしてはファイルネームなしとして改行したのちに行バッファの位置をずらしてDOSファイルネームを入力する。
-  2335  CD0300        			CALL	GETL
+  2319  11AE11        			LD		DE,MBUF    ;ファイルネームを指示するための苦肉の策。LOADコマンドとしてはファイルネームなしとして改行したのちに行バッファの位置をずらしてDOSファイルネームを入力する。
+  231C  CD0300        			CALL	GETL
                       			
-  2338  11B711        			LD		DE,MBUF+9
+  231F  11B711        			LD		DE,MBUF+9
                       			
-  233B  1A            			LD		A,(DE)
+  2322  1A            			LD		A,(DE)
                       	;**** ファイルネームの先頭が'*'なら拡張コマンド処理へ移行 ****
-  233C  FE2A          			CP		'*'
-  233E  2856          			JR		Z,MLHCMD
+  2323  FE2A          			CP		'*'
+  2325  2856          			JR		Z,MLHCMD
                       	
-  2340  3E93          			LD		A,93H      ;HEADER LOADコマンド93H
-  2342  CD5325        			CALL	MCMD       ;コマンドコード送信
-  2345  A7            			AND		A          ;00以外ならERROR
-  2346  2086          			JR		NZ,MERR
+  2327  3E93          			LD		A,93H      ;HEADER LOADコマンド93H
+  2329  CD2125        			CALL	MCMD       ;コマンドコード送信
+  232C  A7            			AND		A          ;00以外ならERROR
+  232D  2086          			JR		NZ,MERR
                       	
-  2348                	MLH1:
-  2348  1A            			LD		A,(DE)
-  2349  FE20          			CP		20H                 ;行頭のスペースをファイルネームまで読み飛ばし
-  234B  2003          			JR		NZ,MLH2
-  234D  13            			INC		DE
-  234E  18F8          			JR		MLH1
+  232F                	MLH1:
+  232F  1A            			LD		A,(DE)
+  2330  FE20          			CP		20H                 ;行頭のスペースをファイルネームまで読み飛ばし
+  2332  2003          			JR		NZ,MLH2
+  2334  13            			INC		DE
+  2335  18F8          			JR		MLH1
                       	
-  2350  0620          	MLH2:	LD		B,20H
-  2352  1A            	MLH4:	LD		A,(DE)     ;FNAME送信
-  2353  FE20          			CP		20H
-  2355  3002          			JR		NC,MLH3
-  2357  3E0D          			LD		A,0DH
-  2359                	MLH3:
-  2359  CD3422        			CALL	SNDBYTE
-  235C  13            			INC		DE
-  235D  10F3          			DJNZ	MLH4
-  235F  3E0D          			LD		A,0DH
-  2361  CD3422        			CALL	SNDBYTE
+  2337  0620          	MLH2:	LD		B,20H
+  2339  1A            	MLH4:	LD		A,(DE)     ;FNAME送信
+  233A  FE20          			CP		20H
+  233C  3002          			JR		NC,MLH3
+  233E  3E0D          			LD		A,0DH
+  2340                	MLH3:
+  2340  CD3422        			CALL	SNDBYTE
+  2343  13            			INC		DE
+  2344  10F3          			DJNZ	MLH4
+  2346  3E0D          			LD		A,0DH
+  2348  CD3422        			CALL	SNDBYTE
                       			
-  2364  CD2122        	MLN5:	CALL	RCVBYTE    ;状態取得(00H=OK)
-  2367  A7            			AND		A          ;00以外ならERROR
-  2368  C2CE22        			JP		NZ,MERR
+  234B  CD2122        	MLN5:	CALL	RCVBYTE    ;状態取得(00H=OK)
+  234E  A7            			AND		A          ;00以外ならERROR
+  234F  C2B522        			JP		NZ,MERR
                       	
-  236B  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  236E  A7            			AND		A          ;00以外ならERROR
-  236F  C2CE22        			JP		NZ,MERR
+  2352  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  2355  A7            			AND		A          ;00以外ならERROR
+  2356  C2B522        			JP		NZ,MERR
                       	
-  2372  21F010        			LD		HL,IBUFE
-  2375  0680          			LD		B,80H
-  2377  CD2122        	MLH5:	CALL	RCVBYTE    ;読みだされたインフォメーションブロックを受信
-  237A  77            			LD		(HL),A
-  237B  23            			INC		HL
-  237C  10F9          			DJNZ	MLH5
+  2359  21F010        			LD		HL,IBUFE
+  235C  0680          			LD		B,80H
+  235E  CD2122        	MLH5:	CALL	RCVBYTE    ;読みだされたインフォメーションブロックを受信
+  2361  77            			LD		(HL),A
+  2362  23            			INC		HL
+  2363  10F9          			DJNZ	MLH5
                       	
-  237E  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  2381  A7            			AND		A          ;00以外ならERROR
-  2382  C2CE22        			JP		NZ,MERR
+  2365  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  2368  A7            			AND		A          ;00以外ならERROR
+  2369  C2B522        			JP		NZ,MERR
                       	
-  2385  11F010        			LD		DE,IBUFE
-  2388  210010        			LD		HL,ELMD		;DOSファイル名とIFBファイル名が異なっていても一致したことにする
-  238B  0612          			LD		B,12H
-  238D  1A            	MLH7:	LD		A,(DE)
-  238E  77            			LD		(HL),A
-  238F  13            			INC		DE
-  2390  23            			INC		HL
-  2391  10FA          			DJNZ	MLH7
+  236C  11F010        			LD		DE,IBUFE
+  236F  210010        			LD		HL,ELMD		;DOSファイル名とIFBファイル名が異なっていても一致したことにする
+  2372  0612          			LD		B,12H
+  2374  1A            	MLH7:	LD		A,(DE)
+  2375  77            			LD		(HL),A
+  2376  13            			INC		DE
+  2377  23            			INC		HL
+  2378  10FA          			DJNZ	MLH7
                       			
-  2393  C3C922        			JP		MRET       ;正常RETURN
+  237A  C3B022        			JP		MRET       ;正常RETURN
                       	
                       	;**************************** アプリケーション内SD-CARD操作処理 **********************
-  2396                	MLHCMD:
+  237D                	MLHCMD:
                       	;**** HL、DE、BCレジスタを保存 ****
-  2396  E5            			PUSH	HL
-  2397  D5            			PUSH	DE
-  2398  C5            			PUSH	BC
-  2399  13            			INC		DE
-  239A  0603          			LD		B,03H
+  237D  E5            			PUSH	HL
+  237E  D5            			PUSH	DE
+  237F  C5            			PUSH	BC
+  2380  13            			INC		DE
+  2381  0603          			LD		B,03H
                       	;**** FDLコマンド ****
-  239C  21F423        			LD		HL,CMD1
-  239F  CDE023        			CALL	CMPSTR
-  23A2  2806          			JR		Z,MLHCMD2
-  23A4  C1            			POP		BC
-  23A5  D1            			POP		DE
-  23A6  E1            			POP		HL
+  2383  21DB23        			LD		HL,CMD1
+  2386  CDC723        			CALL	CMPSTR
+  2389  2806          			JR		Z,MLHCMD2
+  238B  C1            			POP		BC
+  238C  D1            			POP		DE
+  238D  E1            			POP		HL
                       	;**** ファイルネーム入力へ復帰 ****
-  23A7  C32723        			JP		MLH6
+  238E  C30E23        			JP		MLH6
                       	
-  23AA                	MLHCMD2:
-  23AA  13            			INC		DE
-  23AB  13            			INC		DE
-  23AC  13            			INC		DE
-  23AD  211F25        			LD		HL,MSG_DNAME         ;行頭に'DOS FILE:'を付けることでカーソルを移動させリターンで実行できるように
-  23B0  010900        			LD		BC,MSG_DNAMEEND-MSG_DNAME
+  2391                	MLHCMD2:
+  2391  13            			INC		DE
+  2392  13            			INC		DE
+  2393  13            			INC		DE
+  2394  21ED24        			LD		HL,MSG_DNAME         ;行頭に'DOS FILE:'を付けることでカーソルを移動させリターンで実行できるように
+  2397  010900        			LD		BC,MSG_DNAMEEND-MSG_DNAME
                       	;**** FDLコマンド呼び出し ****
-  23B3  CD4D24        			CALL	DIRLIST
-  23B6  A7            			AND		A          ;00以外ならERROR
-  23B7  2006          			JR		NZ,SERR
-  23B9  C1            			POP		BC
-  23BA  D1            			POP		DE
-  23BB  E1            			POP		HL
+  239A  CD1B24        			CALL	DIRLIST
+  239D  A7            			AND		A          ;00以外ならERROR
+  239E  2006          			JR		NZ,SERR
+  23A0  C1            			POP		BC
+  23A1  D1            			POP		DE
+  23A2  E1            			POP		HL
                       	;**** ファイルネーム入力へ復帰 ****
-  23BC  C32723        			JP		MLH6
+  23A3  C30E23        			JP		MLH6
                       	
                       	;******* アプリケーション内SD-CARD操作処理用ERROR処理 **************
-  23BF                	SERR:
-  23BF  FEF0          			CP		0F0H
-  23C1  2005          			JR		NZ,SERR3
-  23C3  11D124        			LD		DE,MSG_F0
-  23C6  180C          			JR		SERRMSG
+  23A6                	SERR:
+  23A6  FEF0          			CP		0F0H
+  23A8  2005          			JR		NZ,SERR3
+  23AA  119F24        			LD		DE,MSG_F0
+  23AD  180C          			JR		SERRMSG
                       			
-  23C8  FEF1          	SERR3:	CP		0F1H
-  23CA  2005          			JR		NZ,SERR99
-  23CC  11EA24        			LD		DE,MSG_F1
-  23CF  1803          			JR		SERRMSG
+  23AF  FEF1          	SERR3:	CP		0F1H
+  23B1  2005          			JR		NZ,SERR99
+  23B3  11B824        			LD		DE,MSG_F1
+  23B6  1803          			JR		SERRMSG
                       			
-  23D1                	SERR99:
-  23D1  114525        			LD		DE,MSG99
+  23B8                	SERR99:
+  23B8  111325        			LD		DE,MSG99
                       			
-  23D4                	SERRMSG:
-  23D4  CD1500        			CALL	MSGPR
-  23D7  CD0600        			CALL	LETLN
-  23DA  C1            			POP		BC
-  23DB  D1            			POP		DE
-  23DC  E1            			POP		HL
+  23BB                	SERRMSG:
+  23BB  CD1500        			CALL	MSGPR
+  23BE  CD0600        			CALL	LETLN
+  23C1  C1            			POP		BC
+  23C2  D1            			POP		DE
+  23C3  E1            			POP		HL
                       	;**** ファイルネーム入力へ復帰 ****
-  23DD  C32723        			JP		MLH6
+  23C4  C30E23        			JP		MLH6
                       	
                       	;**** コマンド文字列比較 ****
-  23E0                	CMPSTR:
-  23E0  C5            			PUSH	BC
-  23E1  D5            			PUSH	DE
-  23E2  1A            	CMP1:	LD		A,(DE)
-  23E3  BE            			CP		(HL)
-  23E4  200B          			JR		NZ,CMP2
-  23E6  05            			DEC		B
-  23E7  2808          			JR		Z,CMP2
-  23E9  FE0D          			CP		0Dh
-  23EB  2804          			JR		Z,CMP2
-  23ED  13            			INC		DE
-  23EE  23            			INC		HL
-  23EF  18F1          			JR		CMP1
-  23F1  D1            	CMP2:	POP		DE
-  23F2  C1            			POP		BC
-  23F3  C9            			RET
+  23C7                	CMPSTR:
+  23C7  C5            			PUSH	BC
+  23C8  D5            			PUSH	DE
+  23C9  1A            	CMP1:	LD		A,(DE)
+  23CA  BE            			CP		(HL)
+  23CB  200B          			JR		NZ,CMP2
+  23CD  05            			DEC		B
+  23CE  2808          			JR		Z,CMP2
+  23D0  FE0D          			CP		0Dh
+  23D2  2804          			JR		Z,CMP2
+  23D4  13            			INC		DE
+  23D5  23            			INC		HL
+  23D6  18F1          			JR		CMP1
+  23D8  D1            	CMP2:	POP		DE
+  23D9  C1            			POP		BC
+  23DA  C9            			RET
                       	
                       	;**** コマンドリスト ****
                       	; 将来拡張用
-  23F4  46444C0D      	CMD1:	DB		'FDL',0DH
+  23DB  46444C0D      	CMD1:	DB		'FDL',0DH
                       	
                       	
                       	;**************************** 04F8H MONITOR リード データ代替処理 ********************
-  23F8                	MLDAT:
-  23F8  D5            			PUSH	DE
-  23F9  C5            			PUSH	BC
-  23FA  E5            			PUSH	HL
-  23FB  3E94          			LD		A,94H      ;DATA LOADコマンド94H
-  23FD  CD5325        			CALL	MCMD       ;コマンドコード送信
-  2400  A7            			AND		A          ;00以外ならERROR
-  2401  C2CE22        			JP		NZ,MERR
+  23DF                	MLDAT:
+  23DF  D5            			PUSH	DE
+  23E0  C5            			PUSH	BC
+  23E1  E5            			PUSH	HL
+  23E2  3E94          			LD		A,94H      ;DATA LOADコマンド94H
+  23E4  CD2125        			CALL	MCMD       ;コマンドコード送信
+  23E7  A7            			AND		A          ;00以外ならERROR
+  23E8  C2B522        			JP		NZ,MERR
                       	
-  2404  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  23EB  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  23EE  A7            			AND		A          ;00以外ならERROR
+  23EF  C2B522        			JP		NZ,MERR
+                      	
+  23F2  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  23F5  A7            			AND		A          ;00以外ならERROR
+  23F6  C2B522        			JP		NZ,MERR
+                      	
+  23F9  79            			LD		A,C        ;FSIZE送信
+  23FA  CD3422        			CALL	SNDBYTE
+  23FD  78            			LD		A,B        ;FSIZE送信
+  23FE  CD3422        			CALL	SNDBYTE
+  2401  CD0E24        			CALL	DBRCV      ;FSIZE分のデータを受信し、SADRSから格納。分割ロードの場合、直前に0436HでOPENされたファイルを対象として256バイトずつSADRSが加算されて04F8HがCALLされる。
+                      	
+                      	
+  2404  CD2122        	MLD1:	CALL	RCVBYTE    ;状態取得(00H=OK)
   2407  A7            			AND		A          ;00以外ならERROR
-  2408  C2CE22        			JP		NZ,MERR
+  2408  C2B522        			JP		NZ,MERR
                       	
-  240B  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  240E  A7            			AND		A          ;00以外ならERROR
-  240F  C2CE22        			JP		NZ,MERR
-                      	
-  2412  21F010        			LD		HL,IBUFE
-  2415  7E            			LD		A,(HL)
-  2416  FE05          			CP		05H				;FILE MODEが05ならBASIC TEXT START ADDRESSをSADRSにセット
-  2418  2006          			JR		NZ,MLD0
-  241A  2A7010        			LD		HL,(TEXTST)
-  241D  220411        			LD		(SADRS),HL
-                      	
-                      	;		LD		HL,(FSIZE)
-                      	;		LD		(10E8H),HL
-                      	
-  2420  110211        	MLD0:	LD		DE,FSIZE   ;FSIZE送信
-  2423  1A            			LD		A,(DE)
-  2424  CD3422        			CALL	SNDBYTE
-  2427  13            			INC		DE
-  2428  1A            			LD		A,(DE)
-  2429  CD3422        			CALL	SNDBYTE
-  242C  CD3924        			CALL	DBRCV      ;FSIZE分のデータを受信し、SADRSから格納。分割ロードの場合、直前に0436HでOPENされたファイルを対象として256バイトずつSADRSが加算されて04F8HがCALLされる。
-                      	
-                      	
-  242F  CD2122        	MLD1:	CALL	RCVBYTE    ;状態取得(00H=OK)
-  2432  A7            			AND		A          ;00以外ならERROR
-  2433  C2CE22        			JP		NZ,MERR
-                      	
-  2436  C3C922        			JP		MRET       ;正常RETURN
+  240B  C3B022        			JP		MRET       ;正常RETURN
                       	
                       	;データ受信
-  2439  ED5B0211      	DBRCV:	LD		DE,(FSIZE)
-  243D  2A0411        			LD		HL,(SADRS)
-  2440  CD2122        	DBRLOP:	CALL	RCVBYTE
-  2443  77            			LD		(HL),A
-  2444  1B            			DEC		DE
-  2445  7A            			LD		A,D
-  2446  B3            			OR		E
-  2447  23            			INC		HL
-  2448  20F6          			JR		NZ,DBRLOP   ;DE=0までLOOP
-  244A  C9            			RET
+  240E                	DBRCV:
+  240E  CD2122        	DBRLOP:	CALL	RCVBYTE
+  2411  77            			LD		(HL),A
+  2412  0B            			DEC		BC
+  2413  78            			LD		A,B
+  2414  B1            			OR		C
+  2415  23            			INC		HL
+  2416  20F6          			JR		NZ,DBRLOP   ;DE=0までLOOP
+  2418  C9            			RET
                       	
                       	;************************** 0588H VRFY CMT ベリファイ代替処理 *******************
-  244B  AF            	MVRFY:	XOR		A          ;正常終了フラグ
-  244C  C9            			RET
+  2419  AF            	MVRFY:	XOR		A          ;正常終了フラグ
+  241A  C9            			RET
                       	
                       	
                       	;**** DIRLIST本体 (HL=行頭に付加する文字列の先頭アドレス BC=行頭に付加する文字列の長さ) ****
                       	;****              戻り値 A=エラーコード ****
-  244D                	DIRLIST:
-  244D  3E83          			LD		A,83H      ;DIRLISTコマンド83Hを送信
-  244F  CD6422        			CALL	STCD       ;コマンドコード送信
-  2452  A7            			AND		A          ;00以外ならERROR
-  2453  207B          			JR		NZ,DLRET
+  241B                	DIRLIST:
+  241B  3E83          			LD		A,83H      ;DIRLISTコマンド83Hを送信
+  241D  CD6422        			CALL	STCD       ;コマンドコード送信
+  2420  A7            			AND		A          ;00以外ならERROR
+  2421  207B          			JR		NZ,DLRET
                       			
-  2455  C5            			PUSH	BC
-  2456  0621          			LD		B,21H
-  2458  1A            	STLT1:	LD		A,(DE)
-  2459  FE0D          			CP		0DH
-  245B  2002          			JR		NZ,STLT2
-  245D  3E00          			LD		A,00H
-  245F  CD3422        	STLT2:	CALL	SNDBYTE           ;ページ指示を送信
-  2462  13            			INC		DE
-  2463  10F3          			DJNZ	STLT1
-  2465  C1            			POP		BC
-  2466                	DL1:
-  2466  E5            			PUSH	HL
-  2467  C5            			PUSH	BC
-  2468  11A411        			LD		DE,LBUF
-  246B  EDB0          			LDIR
-  246D  EB            			EX		DE,HL
-  246E  CD2122        	DL2:	CALL	RCVBYTE           ;'00H'を受信するまでを一行とする
-  2471  FE00          			CP		00H
-  2473  280C          			JR		Z,DL3
-  2475  FEFF          			CP		0FFH              ;'0FFH'を受信したら終了
-  2477  2813          			JR		Z,DL4
-  2479  FEFE          			CP		0FEH              ;'0FEH'を受信したら一時停止して一文字入力待ち
-  247B  2816          			JR		Z,DL5
-  247D  77            			LD		(HL),A
-  247E  23            			INC		HL
-  247F  18ED          			JR		DL2
-  2481                	DL3:
-  2481  77            			LD		(HL),A
-  2482  11A411        			LD		DE,LBUF           ;'00H'を受信したら一行分を表示して改行
-  2485  CD1500        			CALL	MSGPR
+  2423  C5            			PUSH	BC
+  2424  0621          			LD		B,21H
+  2426  1A            	STLT1:	LD		A,(DE)
+  2427  FE0D          			CP		0DH
+  2429  2002          			JR		NZ,STLT2
+  242B  3E00          			LD		A,00H
+  242D  CD3422        	STLT2:	CALL	SNDBYTE           ;ページ指示を送信
+  2430  13            			INC		DE
+  2431  10F3          			DJNZ	STLT1
+  2433  C1            			POP		BC
+  2434                	DL1:
+  2434  E5            			PUSH	HL
+  2435  C5            			PUSH	BC
+  2436  11A411        			LD		DE,LBUF
+  2439  EDB0          			LDIR
+  243B  EB            			EX		DE,HL
+  243C  CD2122        	DL2:	CALL	RCVBYTE           ;'00H'を受信するまでを一行とする
+  243F  FE00          			CP		00H
+  2441  280C          			JR		Z,DL3
+  2443  FEFF          			CP		0FFH              ;'0FFH'を受信したら終了
+  2445  2813          			JR		Z,DL4
+  2447  FEFE          			CP		0FEH              ;'0FEH'を受信したら一時停止して一文字入力待ち
+  2449  2816          			JR		Z,DL5
+  244B  77            			LD		(HL),A
+  244C  23            			INC		HL
+  244D  18ED          			JR		DL2
+  244F                	DL3:
+  244F  77            			LD		(HL),A
+  2450  11A411        			LD		DE,LBUF           ;'00H'を受信したら一行分を表示して改行
+  2453  CD1500        			CALL	MSGPR
                       	;		CALL	LETLN
-  2488  C1            			POP		BC
-  2489  E1            			POP		HL
-  248A  18DA          			JR		DL1
-  248C  CD2122        	DL4:	CALL	RCVBYTE           ;状態取得(00H=OK)
-  248F  C1            			POP		BC
-  2490  E1            			POP		HL
-  2491  183D          			JR		DLRET
+  2456  C1            			POP		BC
+  2457  E1            			POP		HL
+  2458  18DA          			JR		DL1
+  245A  CD2122        	DL4:	CALL	RCVBYTE           ;状態取得(00H=OK)
+  245D  C1            			POP		BC
+  245E  E1            			POP		HL
+  245F  183D          			JR		DLRET
                       	
-  2493  11F824        	DL5:	LD		DE,MSG_KEY1        ;HIT ANT KEY表示
-  2496  CD1500        			CALL	MSGPR
+  2461  11C624        	DL5:	LD		DE,MSG_KEY1        ;HIT ANT KEY表示
+  2464  CD1500        			CALL	MSGPR
                       	
-  2499  3E12          			LD		A,12H              ;上矢印文字を表示
-  249B  DF            			RST		18H
-  249C  04            			DB		04H
+  2467  3E12          			LD		A,12H              ;上矢印文字を表示
+  2469  DF            			RST		18H
+  246A  04            			DB		04H
                       	
-  249D  110F25        			LD		DE,MSG_KEY2        ;HIT ANT KEY表示
-  24A0  CD1500        			CALL	MSGPR
-  24A3  CD0600        			CALL	LETLN
-  24A6  CD1B00        	DL6:	CALL	GETKEY            ;1文字入力待ち
-  24A9  FE00          			CP		00H
-  24AB  28F9          			JR		Z,DL6
-  24AD  FE12          			CP		12H               ;カーソル↑で打ち切り
-  24AF  280D          			JR		Z,DL9
-  24B1  FE42          			CP		42H               ;「B」で前ページ
-  24B3  2813          			JR		Z,DL8
+  246B  11DD24        			LD		DE,MSG_KEY2        ;HIT ANT KEY表示
+  246E  CD1500        			CALL	MSGPR
+  2471  CD0600        			CALL	LETLN
+  2474  CD1B00        	DL6:	CALL	GETKEY            ;1文字入力待ち
+  2477  FE00          			CP		00H
+  2479  28F9          			JR		Z,DL6
+  247B  FE12          			CP		12H               ;カーソル↑で打ち切り
+  247D  280D          			JR		Z,DL9
+  247F  FE42          			CP		42H               ;「B」で前ページ
+  2481  2813          			JR		Z,DL8
                       	
-  24B5  CD1E00        			CALL	BRKCHK
-  24B8  280C          			JR		Z,DL7             ;SHIFT+BREAKで打ち切り
+  2483  CD1E00        			CALL	BRKCHK
+  2486  280C          			JR		Z,DL7             ;SHIFT+BREAKで打ち切り
                       	
-  24BA  3E00          			LD		A,00H             ;それ以外で継続
-  24BC  180A          			JR		DL8
-  24BE                	DL9:
-  24BE  3E12          			LD		A,12H             ;カーソル↑で打ち切ったときにカーソル2行上へ
-  24C0  DF            			RST		18H
-  24C1  03            			DB		03H
-  24C2  3E12          			LD		A,12H
-  24C4  DF            			RST		18H
-  24C5  03            			DB		03H
-  24C6  3EFF          	DL7:	LD		A,0FFH            ;0FFH中断コードを送信
-  24C8  CD3422        	DL8:	CALL	SNDBYTE
-  24CB  CD0600        			CALL	LETLN
-  24CE  189E          			JR		DL2
+  2488  3E00          			LD		A,00H             ;それ以外で継続
+  248A  180A          			JR		DL8
+  248C                	DL9:
+  248C  3E12          			LD		A,12H             ;カーソル↑で打ち切ったときにカーソル2行上へ
+  248E  DF            			RST		18H
+  248F  03            			DB		03H
+  2490  3E12          			LD		A,12H
+  2492  DF            			RST		18H
+  2493  03            			DB		03H
+  2494  3EFF          	DL7:	LD		A,0FFH            ;0FFH中断コードを送信
+  2496  CD3422        	DL8:	CALL	SNDBYTE
+  2499  CD0600        			CALL	LETLN
+  249C  189E          			JR		DL2
                       			
-  24D0                	DLRET:		
-  24D0  C9            			RET
+  249E                	DLRET:		
+  249E  C9            			RET
                       			
                       	
                       	;******** MESSAGE DATA ********************
-  24D1                	MSG_F0:
-  24D1  53442D43415244			DB		'SD-CARD INITIALIZE ERROR'
-  24E9  00            			DB		00H
+  249F                	MSG_F0:
+  249F  53442D43415244			DB		'SD-CARD INITIALIZE ERROR'
+  24B7  00            			DB		00H
                       			
-  24EA                	MSG_F1:
-  24EA  4E4F542046494E			DB		'NOT FIND FILE'
-  24F7  00            			DB		00H
+  24B8                	MSG_F1:
+  24B8  4E4F542046494E			DB		'NOT FIND FILE'
+  24C5  00            			DB		00H
                       			
-  24F8                	MSG_KEY1:
-  24F8  4E4558543A414E			DB		'NEXT:ANY BACK:B BREAK:'
-  250E  00            			DB		00H
-  250F                	MSG_KEY2:
-  250F  204F5220534849			DB		' OR SHIFT+BREAK'
-  251E  00            			DB		00H
+  24C6                	MSG_KEY1:
+  24C6  4E4558543A414E			DB		'NEXT:ANY BACK:B BREAK:'
+  24DC  00            			DB		00H
+  24DD                	MSG_KEY2:
+  24DD  204F5220534849			DB		' OR SHIFT+BREAK'
+  24EC  00            			DB		00H
                       			
-  251F                	MSG_DNAME:
-  251F  444F532046494C			DB		'DOS FILE:'
-  2528                	MSG_DNAMEEND:
-  2528  20202020202020			DB		'                            '
-  2544  00            			DB		00H
+  24ED                	MSG_DNAME:
+  24ED  444F532046494C			DB		'DOS FILE:'
+  24F6                	MSG_DNAMEEND:
+  24F6  20202020202020			DB		'                            '
+  2512  00            			DB		00H
                       	
-  2545                	MSG99:
-  2545  554E4B4E4F574E			DB		'UNKNOWN ERROR'
-  2552  00            			DB		00H
+  2513                	MSG99:
+  2513  554E4B4E4F574E			DB		'UNKNOWN ERROR'
+  2520  00            			DB		00H
                       	
                       	;******* 代替処理用コマンドコード送信 (IN:A コマンドコード) **********
-  2553  F5            	MCMD:	PUSH	AF
-  2554  CD1622        			CALL	INIT
-  2557  F1            			POP		AF
-  2558  CD3422        			CALL	SNDBYTE    ;コマンドコード送信
-  255B  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
-  255E  C9            			RET
+  2521  F5            	MCMD:	PUSH	AF
+  2522  CD1622        			CALL	INIT
+  2525  F1            			POP		AF
+  2526  CD3422        			CALL	SNDBYTE    ;コマンドコード送信
+  2529  CD2122        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  252C  C9            			RET
                       	
-  255F                			END
+  252D                			END
 
