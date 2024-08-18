@@ -370,7 +370,8 @@ NEW NAME:TEST2[CR]
 
 　バイナリエディタで先頭の1Byteを「02」から「05」に修正すればCMT用となり、SDから読込めるようになります。
 
-##### LOAD"xxxx",A、SAVE"xxxx",A、RUN"xxxx",Aのアスキー形式でのLOAD、SAVEの実行は出来ません。実行すると暴走するので実行しないでください。
+##### 2024.8.18 LOAD"xxxx",A、SAVE"xxxx",A、RUN"xxxx",Aのアスキー形式でのLOAD、SAVEも正常に動作するようになりました。
+##### ~~LOAD"xxxx",A、SAVE"xxxx",A、RUN"xxxx",Aのアスキー形式でのLOAD、SAVEの実行は出来ません。実行すると暴走するので実行しないでください。~~
 
 　RUN"xxxx"及びRUN"xxxx",RコマンドでSDから読込後即実行は可能です。
 
@@ -633,3 +634,5 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 2024.8.8 BASIC MZ-5Z001のSD対応パッチを更新しました。
 
 2024.8.10 BASIC MZ-5Z001のLOADコマンドで「*FDL」を使えるようにした。
+
+2024.8.18 ecd102様に教えて頂いた情報に基づいてmz-5z001_SD_ACCRESSを修正。
