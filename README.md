@@ -636,3 +636,5 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 2024.8.10 BASIC MZ-5Z001のLOADコマンドで「*FDL」を使えるようにした。
 
 2024.8.18 ecd102様に教えて頂いた情報に基づいてmz-5z001_SD_ACCRESSを修正。
+
+2025.12.4 kuran_kuranさんにArduinoプログラムのバグを発見していただきました。精査した結果、不要な処理であったため削除しました。なお、未修正のままでも実害はありません。kuran_kuranさん、ありがとうございました。
