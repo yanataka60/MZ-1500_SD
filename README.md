@@ -656,3 +656,5 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 2025.12.4 kuran_kuranさんにArduinoプログラムのバグを発見していただきました。精査した結果、不要な処理が含まれていることが原因であったため不要な処理部分を削除しました。なお、未修正のままでも実害はありません。kuran_kuranさん、ありがとうございました。
 
 2026.1.23 EMMサポートプログラムを追加。
+
+2026.3.1 MZ-1500_SDリポジトリEMMフォルダ内の1Z-009B_SD_Launcher.binがCHECKSUM計算前のファイルをアップしており、正常起動できませんでしたので更新しました。
