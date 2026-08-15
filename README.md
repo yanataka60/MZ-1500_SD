@@ -635,8 +635,8 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 
 　BouKiCHiさんのHuDiskなどを使いMZ-700用HuBASICの起動ディスクイメージを作成したうえでEMMMENUのEMMLOADでEMMに書き込む必要があります。
 
-### BOOT LOADERをROMに書き込む
-　EMMフォルダ内の1Z-009B_SD_Launcher.binをROMライター(TL866II Plus等)を使って27256に書き込んでください。
+~~### BOOT LOADERをROMに書き込む~~
+~~EMMフォルダ内の1Z-009B_SD_Launcher.binをROMライター(TL866II Plus等)を使って27256に書き込んでください。~~
 
 ## 謝辞
 　基板の作成に当たり以下のデータを使わせていただきました。ありがとうございました。
