@@ -621,11 +621,9 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 　1Z-1R12_Header.exeを起動したフォルダにチェックサムを正しく計算したMZ1500SD.ROMというファイル名で作成されます。
 
 ## EMMボード for MZ-700からの起動
-(2026.8.15)多段ロード対応に伴い、MZ-1500_SD/Z80/1Z-009B_Launcher/1Z-009B_SD_Launcher.binに取り込みました。
+　拙作EMMボード for MZ-700をバッテリーバックアップに対応させたのでEMM_for_MZ-700から起動するコマンドを追加してみました。
 
-~~拙作EMMボード for MZ-700をバッテリーバックアップに対応させたのでEMM_for_MZ-700から起動するコマンドを追加してみました。~~
-
-~~https://github.com/yanataka60/EMM_for_MZ-700~~
+　https://github.com/yanataka60/EMM_for_MZ-700
 
 　コマンド「FDE0」～「FDE3」を使うことで「EMM0」～「EMM3」のHuBASICから起動させることが出来ます。
 
@@ -635,7 +633,8 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 
 　BouKiCHiさんのHuDiskなどを使いMZ-700用HuBASICの起動ディスクイメージを作成したうえでEMMMENUのEMMLOADでEMMに書き込む必要があります。
 
-~~### BOOT LOADERをROMに書き込む~~
+### BOOT LOADERをROMに書き込む
+　(2026.8.15)多段ロード対応に伴い、MZ-1500_SD/Z80/1Z-009B_Launcher/1Z-009B_SD_Launcher.binに統合しました。
 
 ~~EMMフォルダ内の1Z-009B_SD_Launcher.binをROMライター(TL866II Plus等)を使って27256に書き込んでください。~~
 
