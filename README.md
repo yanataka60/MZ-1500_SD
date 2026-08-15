@@ -33,6 +33,17 @@ MZ-1500でSD-CARDからのアプリケーション起動、BASICなどのアプ�
 
 　なお、Arduino、ROMへ書き込むための機器が別途必要となります。
 
+
+### (2026.8.15追記)多段ロードに対応するためArduinoプログラム及びROMプログラムを更新しました。
+
+### 多段ロードの詳細についてはMZ-80K_SDの「多段ロード対応」を参照してください。
+
+　多段ロード対応:https://github.com/yanataka60/MZ80K_SD#%E5%A4%9A%E6%AE%B5%E3%83%AD%E3%83%BC%E3%83%89%E5%AF%BE%E5%BF%9C2026813
+
+　ただし、SDアクセスルーチンがROM上にあるMZ-80K_SD、MZ-700_SDとは違いMZ-1500_SDはRAM上にあるため、１段目のプログラムがSDアクセスルーチンを破壊してしまい、多段ロードが機能しないことが多いです。
+
+　ArduinoプログラムはMZ-80K_SD用に更新したものがそのまま使えます。
+
 ## 回路図
 　KiCadフォルダ内のMZ-1500_SD.pdfを参照してください。
 
@@ -610,9 +621,11 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 　1Z-1R12_Header.exeを起動したフォルダにチェックサムを正しく計算したMZ1500SD.ROMというファイル名で作成されます。
 
 ## EMMボード for MZ-700からの起動
-　拙作EMMボード for MZ-700をバッテリーバックアップに対応させたのでEMM_for_MZ-700から起動するコマンドを追加してみました。
+(2026.8.15)多段ロード対応に伴い、MZ-1500_SD/Z80/1Z-009B_Launcher/1Z-009B_SD_Launcher.binに取り込みました。
 
-　https://github.com/yanataka60/EMM_for_MZ-700
+~~　拙作EMMボード for MZ-700をバッテリーバックアップに対応させたのでEMM_for_MZ-700から起動するコマンドを追加してみました。~~
+
+~~　https://github.com/yanataka60/EMM_for_MZ-700~~
 
 　コマンド「FDE0」～「FDE3」を使うことで「EMM0」～「EMM3」のHuBASICから起動させることが出来ます。
 
@@ -658,3 +671,5 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 2026.1.23 EMMサポートプログラムを追加。
 
 2026.3.1 MZ-1500_SDリポジトリEMMフォルダ内の1Z-009B_SD_Launcher.binがCHECKSUM計算前のファイルをアップしており、正常起動できませんでしたので更新しました。
+
+2026.8.15 多段ロードに対応しました。
