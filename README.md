@@ -623,9 +623,9 @@ https://github.com/yanataka60/MZ80K_SD/tree/main/ROPOKO-TRIAL
 ## EMMボード for MZ-700からの起動
 (2026.8.15)多段ロード対応に伴い、MZ-1500_SD/Z80/1Z-009B_Launcher/1Z-009B_SD_Launcher.binに取り込みました。
 
-~~　拙作EMMボード for MZ-700をバッテリーバックアップに対応させたのでEMM_for_MZ-700から起動するコマンドを追加してみました。~~
+~~拙作EMMボード for MZ-700をバッテリーバックアップに対応させたのでEMM_for_MZ-700から起動するコマンドを追加してみました。~~
 
-~~　https://github.com/yanataka60/EMM_for_MZ-700~~
+~~https://github.com/yanataka60/EMM_for_MZ-700~~
 
 　コマンド「FDE0」～「FDE3」を使うことで「EMM0」～「EMM3」のHuBASICから起動させることが出来ます。
 
